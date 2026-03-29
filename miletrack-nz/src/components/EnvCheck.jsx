@@ -15,7 +15,7 @@ export default function EnvCheck({ children }) {
           <div className="text-4xl mb-4">&#9881;&#65039;</div>
           <h1 className="text-xl font-bold text-navy mb-2">Setup Required</h1>
           <p className="text-gray-600 text-sm mb-6">
-            MileTrack NZ needs a Supabase project to run. Follow these steps:
+            Klicks needs a Supabase project to run. Follow these steps:
           </p>
           <div className="text-left space-y-4 text-sm">
             <Step num="1" title="Create a Supabase project">

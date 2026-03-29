@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { ChevronDown, ChevronUp, Check, Car, Clock, FileText, Calculator } from 'lucide-react'
 
 const FAQ_ITEMS = [
   {
@@ -36,12 +35,14 @@ function FAQItem({ q, a }) {
     <div className="border-b border-gray-200">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between py-4 text-left text-navy font-medium"
+        className="w-full flex items-center justify-between py-4 text-left text-on-surface font-body font-medium"
       >
         {q}
-        {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        <span className="material-symbols-outlined text-on-surface-variant text-[18px] flex-shrink-0 ml-2">
+          {open ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+        </span>
       </button>
-      {open && <p className="pb-4 text-gray-600 text-sm">{a}</p>}
+      {open && <p className="pb-4 text-on-surface-variant font-body text-sm">{a}</p>}
     </div>
   )
 }
@@ -81,29 +82,29 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-white">
+    <div className="bg-surface-container-lowest font-body">
       {/* Hero */}
-      <section className="bg-navy text-white">
+      <section className="bg-primary-container text-white">
         <div className="max-w-4xl mx-auto px-4 py-16 md:py-24 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            MileTrack NZ
+          <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight mb-4 text-white">
+            Klicks
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-2">
+          <p className="text-xl md:text-2xl text-white/80 font-body mb-2">
             Your IRD vehicle logbook. Done in seconds.
           </p>
-          <p className="text-gray-400 mb-8 max-w-xl mx-auto">
+          <p className="text-white/60 font-body mb-8 max-w-xl mx-auto">
             Keep an IRD-compliant vehicle logbook for your business vehicle. Calculate your business use percentage, export a tax-ready PDF report. Built for NZ sole traders.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => { setShowAuth(true); setIsSignUp(true) }}
-              className="bg-accent hover:bg-accent-dark text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
+              className="bg-tertiary-fixed hover:bg-tertiary-fixed-dim text-on-tertiary-fixed font-body font-semibold px-8 py-3 rounded-full text-lg transition-colors shadow-lg shadow-tertiary-fixed/20"
             >
               Start Free Logbook
             </button>
             <Link
               to="/pricing"
-              className="border border-gray-500 hover:border-white text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
+              className="border border-white/30 hover:border-white text-white font-body font-semibold px-8 py-3 rounded-full text-lg transition-colors"
             >
               See Pricing
             </Link>
@@ -113,23 +114,23 @@ export default function Home() {
 
       {/* Features */}
       <section className="max-w-4xl mx-auto px-4 py-16">
-        <h2 className="text-2xl md:text-3xl font-bold text-navy text-center mb-12">
+        <h2 className="font-headline text-2xl md:text-3xl font-bold text-navy text-center mb-12">
           Everything you need for IRD compliance
         </h2>
         <div className="grid md:grid-cols-2 gap-8">
           {[
-            { icon: Clock, title: 'Log trips in 30 seconds', desc: 'One-thumb, mobile-first trip logging. Auto-fills odometer from your last trip. Tap and go.' },
-            { icon: Car, title: '90-day period tracking', desc: 'Progress bar, countdown, and automatic reminders. Never miss a day of your logbook period.' },
-            { icon: Calculator, title: 'Tax deduction calculator', desc: 'Instantly see your estimated deduction using current IRD kilometre rates for your vehicle type.' },
-            { icon: FileText, title: 'IRD-ready PDF export', desc: 'Generate a professional PDF logbook report with cover page, trip log, and summary. Ready for your accountant.' },
-          ].map(({ icon: Icon, title, desc }) => (
+            { icon: 'timer', title: 'Log trips in 30 seconds', desc: 'One-thumb, mobile-first trip logging. Auto-fills odometer from your last trip. Tap and go.' },
+            { icon: 'directions_car', title: '90-day period tracking', desc: 'Progress bar, countdown, and automatic reminders. Never miss a day of your logbook period.' },
+            { icon: 'calculate', title: 'Tax deduction calculator', desc: 'Instantly see your estimated deduction using current IRD kilometre rates for your vehicle type.' },
+            { icon: 'description', title: 'IRD-ready PDF export', desc: 'Generate a professional PDF logbook report with cover page, trip log, and summary. Ready for your accountant.' },
+          ].map(({ icon, title, desc }) => (
             <div key={title} className="flex gap-4">
-              <div className="bg-green-50 rounded-lg p-3 h-fit">
-                <Icon className="text-accent" size={24} />
+              <div className="bg-tertiary-fixed/15 rounded-2xl p-3 h-fit">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[24px]">{icon}</span>
               </div>
               <div>
-                <h3 className="font-semibold text-navy mb-1">{title}</h3>
-                <p className="text-gray-600 text-sm">{desc}</p>
+                <h3 className="font-headline font-semibold text-navy mb-1">{title}</h3>
+                <p className="text-on-surface-variant font-body text-sm">{desc}</p>
               </div>
             </div>
           ))}
@@ -139,7 +140,7 @@ export default function Home() {
       {/* How it works */}
       <section className="bg-gray-50 px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-navy text-center mb-12">
+          <h2 className="font-headline text-2xl md:text-3xl font-bold text-navy text-center mb-12">
             How it works
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -149,11 +150,11 @@ export default function Home() {
               { step: '3', title: 'Log trips daily', desc: 'Quick-log each trip with destination and purpose. We calculate your business percentage.' },
             ].map(({ step, title, desc }) => (
               <div key={step} className="text-center">
-                <div className="bg-accent text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-4">
+                <div className="bg-tertiary-fixed text-on-tertiary-fixed w-10 h-10 rounded-full flex items-center justify-center text-lg font-headline font-bold mx-auto mb-4 shadow-lg shadow-tertiary-fixed/20">
                   {step}
                 </div>
-                <h3 className="font-semibold text-navy mb-2">{title}</h3>
-                <p className="text-gray-600 text-sm">{desc}</p>
+                <h3 className="font-headline font-semibold text-navy mb-2">{title}</h3>
+                <p className="text-on-surface-variant font-body text-sm">{desc}</p>
               </div>
             ))}
           </div>
@@ -162,42 +163,78 @@ export default function Home() {
 
       {/* Pricing preview */}
       <section className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold text-navy mb-4">
+        <h2 className="font-headline text-2xl md:text-3xl font-bold text-navy mb-4">
           Simple, fair pricing
         </h2>
-        <p className="text-gray-600 mb-8">Start free. Upgrade when you need PDF exports and tax calculations.</p>
+        <p className="text-on-surface-variant font-body mb-8">Start free. Upgrade when you need PDF exports and tax calculations.</p>
         <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-          <div className="border rounded-xl p-6 text-left">
-            <h3 className="font-bold text-navy mb-1">Free</h3>
-            <p className="text-2xl font-bold text-navy mb-4">$0</p>
-            <ul className="text-sm text-gray-600 space-y-2">
-              <li className="flex gap-2"><Check size={16} className="text-accent flex-shrink-0 mt-0.5" /> Up to 50 trips</li>
-              <li className="flex gap-2"><Check size={16} className="text-accent flex-shrink-0 mt-0.5" /> Business percentage tracking</li>
-              <li className="flex gap-2"><Check size={16} className="text-accent flex-shrink-0 mt-0.5" /> 90-day period management</li>
+          <div className="bg-surface-container-lowest border border-gray-100 rounded-3xl p-6 text-left shadow-sm">
+            <h3 className="font-headline font-bold text-navy mb-1">Free</h3>
+            <p className="font-headline text-2xl font-bold text-navy mb-4">$0</p>
+            <ul className="font-body text-sm text-on-surface-variant space-y-2">
+              <li className="flex gap-2 items-start">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[16px] flex-shrink-0 mt-0.5">check</span>
+                Up to 50 trips
+              </li>
+              <li className="flex gap-2 items-start">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[16px] flex-shrink-0 mt-0.5">check</span>
+                Business percentage tracking
+              </li>
+              <li className="flex gap-2 items-start">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[16px] flex-shrink-0 mt-0.5">check</span>
+                90-day period management
+              </li>
             </ul>
           </div>
-          <div className="border-2 border-accent rounded-xl p-6 text-left relative">
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">
+          <div className="bg-surface-container-lowest border-2 border-accent rounded-3xl p-6 text-left shadow-lg relative">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-tertiary-fixed text-on-tertiary-fixed text-xs font-label font-bold px-3 py-1 rounded-full uppercase tracking-widest">
               Most Popular
             </span>
-            <h3 className="font-bold text-navy mb-1">Pro</h3>
-            <p className="text-2xl font-bold text-navy mb-4">$9<span className="text-sm font-normal text-gray-500"> NZD/mo</span></p>
-            <ul className="text-sm text-gray-600 space-y-2">
-              <li className="flex gap-2"><Check size={16} className="text-accent flex-shrink-0 mt-0.5" /> Unlimited trips</li>
-              <li className="flex gap-2"><Check size={16} className="text-accent flex-shrink-0 mt-0.5" /> PDF export</li>
-              <li className="flex gap-2"><Check size={16} className="text-accent flex-shrink-0 mt-0.5" /> Tax deduction calculator</li>
-              <li className="flex gap-2"><Check size={16} className="text-accent flex-shrink-0 mt-0.5" /> Multiple vehicles</li>
-              <li className="flex gap-2"><Check size={16} className="text-accent flex-shrink-0 mt-0.5" /> Email reminders</li>
+            <h3 className="font-headline font-bold text-navy mb-1">Pro</h3>
+            <p className="font-headline text-2xl font-bold text-navy mb-4">$9<span className="text-sm font-body font-normal text-on-surface-variant"> NZD/mo</span></p>
+            <ul className="font-body text-sm text-on-surface-variant space-y-2">
+              <li className="flex gap-2 items-start">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[16px] flex-shrink-0 mt-0.5">check</span>
+                Unlimited trips
+              </li>
+              <li className="flex gap-2 items-start">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[16px] flex-shrink-0 mt-0.5">check</span>
+                PDF export
+              </li>
+              <li className="flex gap-2 items-start">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[16px] flex-shrink-0 mt-0.5">check</span>
+                Tax deduction calculator
+              </li>
+              <li className="flex gap-2 items-start">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[16px] flex-shrink-0 mt-0.5">check</span>
+                Multiple vehicles
+              </li>
+              <li className="flex gap-2 items-start">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[16px] flex-shrink-0 mt-0.5">check</span>
+                Email reminders
+              </li>
             </ul>
           </div>
-          <div className="border rounded-xl p-6 text-left">
-            <h3 className="font-bold text-navy mb-1">One-Time Export</h3>
-            <p className="text-2xl font-bold text-navy mb-4">$19<span className="text-sm font-normal text-gray-500"> NZD</span></p>
-            <ul className="text-sm text-gray-600 space-y-2">
-              <li className="flex gap-2"><Check size={16} className="text-accent flex-shrink-0 mt-0.5" /> Unlimited trips</li>
-              <li className="flex gap-2"><Check size={16} className="text-accent flex-shrink-0 mt-0.5" /> One PDF export</li>
-              <li className="flex gap-2"><Check size={16} className="text-accent flex-shrink-0 mt-0.5" /> Tax deduction calculator</li>
-              <li className="flex gap-2"><Check size={16} className="text-accent flex-shrink-0 mt-0.5" /> No subscription</li>
+          <div className="bg-surface-container-lowest border border-gray-100 rounded-3xl p-6 text-left shadow-sm">
+            <h3 className="font-headline font-bold text-navy mb-1">One-Time Export</h3>
+            <p className="font-headline text-2xl font-bold text-navy mb-4">$19<span className="text-sm font-body font-normal text-on-surface-variant"> NZD</span></p>
+            <ul className="font-body text-sm text-on-surface-variant space-y-2">
+              <li className="flex gap-2 items-start">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[16px] flex-shrink-0 mt-0.5">check</span>
+                Unlimited trips
+              </li>
+              <li className="flex gap-2 items-start">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[16px] flex-shrink-0 mt-0.5">check</span>
+                One PDF export
+              </li>
+              <li className="flex gap-2 items-start">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[16px] flex-shrink-0 mt-0.5">check</span>
+                Tax deduction calculator
+              </li>
+              <li className="flex gap-2 items-start">
+                <span className="material-symbols-outlined text-on-tertiary-container text-[16px] flex-shrink-0 mt-0.5">check</span>
+                No subscription
+              </li>
             </ul>
           </div>
         </div>
@@ -206,7 +243,7 @@ export default function Home() {
       {/* FAQ */}
       <section className="bg-gray-50 px-4 py-16">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-navy text-center mb-8">
+          <h2 className="font-headline text-2xl md:text-3xl font-bold text-navy text-center mb-8">
             Frequently Asked Questions
           </h2>
           {FAQ_ITEMS.map(item => (
@@ -218,8 +255,8 @@ export default function Home() {
       {/* Auth modal */}
       {showAuth && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6">
-            <h2 className="text-xl font-bold text-navy mb-4">
+          <div className="bg-surface-container-lowest rounded-3xl w-full max-w-md p-6 shadow-xl">
+            <h2 className="font-headline text-xl font-bold text-navy mb-4">
               {isSignUp ? 'Create your account' : 'Welcome back'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -229,7 +266,7 @@ export default function Home() {
                   placeholder="Your name"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 font-body text-sm focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
                 />
               )}
               <input
@@ -238,7 +275,7 @@ export default function Home() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 font-body text-sm focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
               />
               <input
                 type="password"
@@ -247,29 +284,29 @@ export default function Home() {
                 onChange={e => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 font-body text-sm focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
               />
-              {error && <p className="text-red-500 text-sm">{error}</p>}
+              {error && <p className="text-red-500 font-body text-sm">{error}</p>}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-accent hover:bg-accent-dark text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50"
+                className="w-full bg-tertiary-fixed hover:bg-tertiary-fixed-dim text-on-tertiary-fixed font-body font-semibold py-3 rounded-full transition-colors disabled:opacity-50 shadow-lg shadow-tertiary-fixed/20"
               >
                 {loading ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
               </button>
             </form>
-            <p className="text-center text-sm text-gray-500 mt-4">
+            <p className="text-center font-body text-sm text-on-surface-variant mt-4">
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
               <button
                 onClick={() => { setIsSignUp(!isSignUp); setError('') }}
-                className="text-accent font-medium"
+                className="text-on-tertiary-container font-medium"
               >
                 {isSignUp ? 'Sign in' : 'Sign up'}
               </button>
             </p>
             <button
               onClick={() => setShowAuth(false)}
-              className="mt-4 w-full text-gray-400 text-sm"
+              className="mt-4 w-full text-on-surface-variant font-body text-sm"
             >
               Cancel
             </button>

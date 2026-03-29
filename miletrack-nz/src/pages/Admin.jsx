@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { Users, Receipt, FileText, Send, Lock } from 'lucide-react'
 
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'miletrack-admin-2024'
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'klicks-admin-2024'
 
 export default function Admin() {
   const [authenticated, setAuthenticated] = useState(false)
@@ -29,20 +27,18 @@ export default function Admin() {
       supabase.from('trips').select('id', { count: 'exact' }),
       supabase.from('logbook_periods').select('id, status', { count: 'exact' }),
     ])
-
-    const totalUsers = users.count || 0
-    const proUsers = (users.data || []).filter(u => u.subscription_tier === 'pro').length
-    const totalTrips = trips.count || 0
-    const completedPeriods = (periods.data || []).filter(p => p.status === 'complete').length
-
-    setStats({ totalUsers, proUsers, totalTrips, completedPeriods })
+    setStats({
+      totalUsers: users.count || 0,
+      proUsers: (users.data || []).filter(u => u.subscription_tier === 'pro').length,
+      totalTrips: trips.count || 0,
+      completedPeriods: (periods.data || []).filter(p => p.status === 'complete').length,
+    })
   }
 
   async function handleBroadcast(e) {
     e.preventDefault()
     if (!confirm('Send email to all users?')) return
     setSending(true)
-    // In production, this would call a Supabase Edge Function or Resend API
     alert('Broadcast email queued (implement Resend integration)')
     setSending(false)
     setBroadcastSubject('')
@@ -51,11 +47,11 @@ export default function Admin() {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-        <div className="bg-white rounded-2xl p-6 shadow-sm w-full max-w-sm">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-surface font-body">
+        <div className="bg-surface-container-lowest rounded-xl p-6 shadow-sm w-full max-w-sm">
           <div className="flex items-center gap-2 mb-4">
-            <Lock size={20} className="text-navy" />
-            <h2 className="text-lg font-bold text-navy">Admin Panel</h2>
+            <span className="material-symbols-outlined text-primary-container">lock</span>
+            <h2 className="font-headline text-lg font-bold text-primary">Admin Panel</h2>
           </div>
           <form onSubmit={handleLogin} className="space-y-3">
             <input
@@ -63,12 +59,9 @@ export default function Admin() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="Admin password"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-accent outline-none"
+              className="w-full border border-outline-variant/30 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-tertiary-fixed outline-none"
             />
-            <button
-              type="submit"
-              className="w-full bg-navy text-white py-2.5 rounded-lg font-medium"
-            >
+            <button type="submit" className="w-full bg-primary-container text-white py-2.5 rounded-full font-headline font-bold">
               Login
             </button>
           </form>
@@ -78,25 +71,23 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-surface p-4 font-body">
       <div className="max-w-2xl mx-auto space-y-4">
-        <h2 className="text-xl font-bold text-navy">Admin Panel</h2>
+        <h2 className="font-headline text-xl font-bold text-primary">Admin Panel</h2>
 
-        {/* Stats */}
         {stats && (
           <div className="grid grid-cols-2 gap-3">
-            <StatCard icon={Users} label="Total Users" value={stats.totalUsers} />
-            <StatCard icon={Users} label="Pro Subscribers" value={stats.proUsers} />
-            <StatCard icon={Receipt} label="Trips Logged" value={stats.totalTrips} />
-            <StatCard icon={FileText} label="Completed Periods" value={stats.completedPeriods} />
+            <StatCard icon="group" label="Total Users" value={stats.totalUsers} />
+            <StatCard icon="star" label="Pro Subscribers" value={stats.proUsers} />
+            <StatCard icon="receipt_long" label="Trips Logged" value={stats.totalTrips} />
+            <StatCard icon="description" label="Completed Periods" value={stats.completedPeriods} />
           </div>
         )}
 
-        {/* Broadcast email */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm">
+        <div className="bg-surface-container-lowest rounded-xl p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <Send size={18} className="text-navy" />
-            <h3 className="font-semibold text-navy">Broadcast Email</h3>
+            <span className="material-symbols-outlined text-primary text-lg">send</span>
+            <h3 className="font-headline font-bold text-primary">Broadcast Email</h3>
           </div>
           <form onSubmit={handleBroadcast} className="space-y-3">
             <input
@@ -105,7 +96,7 @@ export default function Admin() {
               onChange={e => setBroadcastSubject(e.target.value)}
               placeholder="Email subject"
               required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-accent outline-none"
+              className="w-full border border-outline-variant/30 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-tertiary-fixed outline-none"
             />
             <textarea
               value={broadcastBody}
@@ -113,12 +104,12 @@ export default function Admin() {
               placeholder="Email body"
               required
               rows={5}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-accent outline-none resize-none"
+              className="w-full border border-outline-variant/30 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-tertiary-fixed outline-none resize-none"
             />
             <button
               type="submit"
               disabled={sending}
-              className="bg-navy text-white px-6 py-2.5 rounded-lg font-medium disabled:opacity-50"
+              className="bg-primary-container text-white px-6 py-2.5 rounded-full font-headline font-bold disabled:opacity-50"
             >
               {sending ? 'Sending...' : 'Send to All Users'}
             </button>
@@ -129,12 +120,12 @@ export default function Admin() {
   )
 }
 
-function StatCard({ icon: Icon, label, value }) {
+function StatCard({ icon, label, value }) {
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm">
-      <Icon size={18} className="text-gray-400 mb-2" />
-      <p className="text-2xl font-bold text-navy">{value}</p>
-      <p className="text-xs text-gray-500">{label}</p>
+    <div className="bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+      <span className="material-symbols-outlined text-on-surface-variant text-lg mb-2 block">{icon}</span>
+      <p className="font-headline text-2xl font-bold text-primary">{value}</p>
+      <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{label}</p>
     </div>
   )
 }
