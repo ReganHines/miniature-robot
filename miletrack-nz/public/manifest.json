@@ -1,6 +1,6 @@
 {
-  "name": "MileTrack NZ",
-  "short_name": "MileTrack",
+  "name": "Klicks",
+  "short_name": "Klicks",
   "description": "IRD-compliant vehicle logbook for NZ self-employed",
   "start_url": "/dashboard",
   "display": "standalone",

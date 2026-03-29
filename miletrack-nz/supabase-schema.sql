@@ -1,4 +1,4 @@
--- MileTrack NZ Database Schema
+-- Klicks (klicks.nz) Database Schema
 -- Run this in Supabase SQL Editor to set up your database
 
 -- Users table (extends Supabase auth)

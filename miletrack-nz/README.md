@@ -1,4 +1,4 @@
-# MileTrack NZ
+# Klicks
 
 **Your IRD vehicle logbook. Done in seconds.**
 
