@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getStripe } from '../lib/stripe'
 
 const PLANS = [
   {
@@ -22,6 +23,7 @@ const PLANS = [
     name: 'Pro',
     price: '$9',
     period: 'NZD/month',
+    stripePriceId: import.meta.env.VITE_STRIPE_PRO_PRICE_ID,
     features: [
       'Unlimited trips',
       'PDF export \u2014 IRD-ready report',
@@ -38,6 +40,7 @@ const PLANS = [
     name: 'One-Time Export',
     price: '$19',
     period: 'NZD one-time',
+    stripePriceId: import.meta.env.VITE_STRIPE_ONETIME_PRICE_ID,
     features: [
       'Unlimited trips',
       'One PDF export',
@@ -52,19 +55,50 @@ const PLANS = [
 export default function Pricing() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(null)
 
-  function handleSelect(planId) {
+  async function handleSelect(plan) {
     if (!user) {
       navigate('/')
       return
     }
-    if (planId === 'free') {
+    if (plan.id === 'free') {
       navigate('/dashboard')
       return
     }
-    // Stripe checkout would go here
-    alert('Stripe checkout coming soon! For now, all features are available.')
-    navigate('/dashboard')
+
+    if (!plan.stripePriceId) {
+      alert('Payment is being set up. Please try again shortly.')
+      return
+    }
+
+    setLoading(plan.id)
+    try {
+      const stripe = await getStripe()
+      if (!stripe) {
+        alert('Payment system is not configured yet.')
+        return
+      }
+
+      const { error } = await stripe.redirectToCheckout({
+        lineItems: [{ price: plan.stripePriceId, quantity: 1 }],
+        mode: plan.id === 'pro' ? 'subscription' : 'payment',
+        successUrl: `${window.location.origin}/dashboard?payment=success`,
+        cancelUrl: `${window.location.origin}/pricing?payment=cancelled`,
+        clientReferenceId: user.id,
+        customerEmail: user.email,
+      })
+
+      if (error) {
+        console.error('Stripe error:', error)
+        alert(error.message)
+      }
+    } catch (err) {
+      console.error('Payment error:', err)
+      alert('Something went wrong. Please try again.')
+    } finally {
+      setLoading(null)
+    }
   }
 
   return (
@@ -111,14 +145,15 @@ export default function Pricing() {
                 ))}
               </ul>
               <button
-                onClick={() => handleSelect(plan.id)}
+                onClick={() => handleSelect(plan)}
+                disabled={loading === plan.id}
                 className={`w-full py-3 rounded-full font-body font-semibold transition-colors ${
                   plan.popular
                     ? 'bg-tertiary-fixed hover:bg-tertiary-fixed-dim text-on-tertiary-fixed shadow-lg shadow-tertiary-fixed/20'
                     : 'border border-gray-200 text-navy hover:bg-gray-50'
-                }`}
+                } ${loading === plan.id ? 'opacity-50 cursor-wait' : ''}`}
               >
-                {plan.cta}
+                {loading === plan.id ? 'Redirecting...' : plan.cta}
               </button>
             </div>
           ))}
