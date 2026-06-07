@@ -1,758 +1,453 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html class="scroll-smooth" lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>The Shelf</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet"/>
-<style>
-:root{
-  --wood-dark:#3d2b1f;
-  --wood-mid:#6b4226;
-  --wood-light:#c8956c;
-  --wood-grain:#d4a574;
-  --shelf-bg:#f5efe6;
-  --cream:#faf6f0;
-  --cream-dark:#ede8de;
-  --ink:#1a1410;
-  --ink-light:#4a3728;
-  --green-deep:#2d4a3e;
-  --green-mid:#4a7c6f;
-  --amber:#c8820a;
-  --amber-light:#e8a830;
-  --highlight:#f0d060;
-  --red-accent:#8b2635;
-}
-
-*{box-sizing:border-box;margin:0;padding:0}
-
-body{
-  font-family:'DM Sans',sans-serif;
-  background-color:#e8ddd0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  color:var(--ink);
-  min-height:100vh;
-  padding-bottom:4rem;
-}
-
-header{text-align:center;padding:3rem 1rem 2rem;position:relative}
-.header-title{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(2.5rem,6vw,4.5rem);
-  font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em;
-}
-.header-underline{
-  display:inline-block;width:80px;height:3px;
-  background:linear-gradient(90deg,var(--amber),var(--amber-light));
-  border-radius:2px;margin:0.6rem auto 0.8rem;
-}
-.header-subtitle{
-  font-size:0.95rem;color:var(--ink-light);font-weight:300;
-  letter-spacing:0.05em;text-transform:uppercase;
-}
-
-.search-wrap{max-width:640px;margin:0 auto 1.5rem;padding:0 1rem;position:relative}
-.search-input{
-  width:100%;padding:0.9rem 3rem 0.9rem 1.2rem;
-  font-family:'DM Sans',sans-serif;font-size:1rem;
-  border:2px solid var(--cream-dark);border-radius:8px;
-  background:var(--cream);color:var(--ink);outline:none;
-  transition:border-color 0.2s,box-shadow 0.2s;
-}
-.search-input:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(200,130,10,0.15)}
-.search-clear{
-  position:absolute;right:1.8rem;top:50%;transform:translateY(-50%);
-  background:none;border:none;font-size:1.2rem;color:var(--ink-light);
-  cursor:pointer;display:none;padding:0.3rem;
-}
-.search-clear.visible{display:block}
-
-.filter-bar{
-  max-width:900px;margin:0 auto 0.8rem;padding:0 1rem;
-  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
-  display:flex;gap:0.5rem;align-items:center;
-}
-.filter-bar::-webkit-scrollbar{display:none}
-.filter-pill{
-  flex-shrink:0;padding:0.4rem 1rem;border-radius:999px;
-  border:1.5px solid var(--cream-dark);background:var(--cream);
-  color:var(--ink-light);font-family:'DM Sans',sans-serif;
-  font-size:0.82rem;font-weight:500;cursor:pointer;
-  transition:all 0.15s;white-space:nowrap;user-select:none;
-}
-.filter-pill:hover{border-color:var(--amber);color:var(--amber)}
-.filter-pill.active{background:var(--amber);border-color:var(--amber);color:#fff}
-.filter-pill.all-pill.active{background:var(--green-deep);border-color:var(--green-deep)}
-
-.extras-row{
-  max-width:900px;margin:0 auto 0.8rem;padding:0 1rem;
-  display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap;
-}
-.btn-surprise{
-  padding:0.45rem 1.1rem;border-radius:6px;border:1.5px solid var(--green-deep);
-  background:transparent;color:var(--green-deep);font-family:'DM Sans',sans-serif;
-  font-size:0.85rem;font-weight:500;cursor:pointer;transition:all 0.15s;
-}
-.btn-surprise:hover{background:var(--green-deep);color:#fff}
-.btn-unread{
-  padding:0.45rem 1.1rem;border-radius:6px;border:1.5px solid var(--cream-dark);
-  background:transparent;color:var(--ink-light);font-family:'DM Sans',sans-serif;
-  font-size:0.85rem;font-weight:500;cursor:pointer;transition:all 0.15s;
-}
-.btn-unread.active{background:var(--red-accent);border-color:var(--red-accent);color:#fff}
-.filter-count{font-size:0.82rem;color:var(--ink-light);font-style:italic}
-.about-tip{
-  margin-left:auto;font-size:0.8rem;color:var(--amber);cursor:pointer;
-  border-bottom:1px dotted var(--amber);position:relative;
-}
-.about-tip:hover .about-tooltip{display:block}
-.about-tooltip{
-  display:none;position:absolute;right:0;top:1.6rem;
-  background:var(--ink);color:var(--cream);border-radius:6px;
-  padding:0.7rem 0.9rem;font-size:0.8rem;line-height:1.5;width:220px;
-  z-index:100;font-style:normal;box-shadow:0 4px 20px rgba(0,0,0,0.3);
-}
-.about-tooltip::before{
-  content:'';position:absolute;right:10px;top:-6px;
-  border-left:6px solid transparent;border-right:6px solid transparent;
-  border-bottom:6px solid var(--ink);
-}
-
-.stats-bar{
-  max-width:900px;margin:0 auto 1.5rem;padding:0.7rem 1.2rem;
-  background:var(--cream);border:1px solid var(--cream-dark);border-radius:8px;
-  display:flex;gap:1.5rem;flex-wrap:wrap;font-size:0.82rem;color:var(--ink-light);
-}
-.stats-bar strong{color:var(--ink);font-weight:500}
-
-.search-results{max-width:900px;margin:-0.5rem auto 1rem;padding:0 1rem;display:none}
-.search-results.visible{display:block}
-.result-card{
-  background:var(--cream);border:1px solid var(--cream-dark);
-  border-left:4px solid var(--amber);border-radius:6px;
-  padding:0.8rem 1rem;margin-bottom:0.5rem;cursor:pointer;transition:box-shadow 0.15s;
-}
-.result-card:hover{box-shadow:0 2px 12px rgba(0,0,0,0.1)}
-.result-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:600}
-.result-meta{font-size:0.8rem;color:var(--ink-light);margin-top:0.2rem}
-
-.shelf-unit{max-width:960px;margin:0 auto;padding:0 1rem}
-.shelf-frame{
-  background:
-    repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(255,255,255,0.03) 40px,rgba(255,255,255,0.03) 41px),
-    linear-gradient(180deg,var(--wood-dark) 0%,var(--wood-mid) 30%,#7a4d2e 60%,var(--wood-dark) 100%);
-  border-radius:12px;padding:20px;
-  box-shadow:0 20px 60px rgba(0,0,0,0.4),0 4px 12px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.1);
-  position:relative;
-}
-.shelf-frame::before{
-  content:'';position:absolute;inset:0;border-radius:12px;
-  background:repeating-linear-gradient(175deg,transparent,transparent 8px,rgba(255,255,255,0.015) 8px,rgba(255,255,255,0.015) 9px);
-  pointer-events:none;
-}
-.shelf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-
-.cube{
-  background:linear-gradient(180deg,#f0e8d8 0%,#e8dcc8 100%);
-  border-radius:6px;padding:10px 10px 0;position:relative;cursor:pointer;
-  transition:transform 0.2s,box-shadow 0.2s;
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08),inset -4px 0 8px rgba(0,0,0,0.06),0 2px 4px rgba(0,0,0,0.15);
-  min-height:140px;display:flex;flex-direction:column;justify-content:flex-end;
-  overflow:hidden;opacity:0;animation:cubeIn 0.4s ease forwards;
-}
-.cube:hover{
-  transform:translateY(-3px) scale(1.01);
-  box-shadow:inset 0 0 0 1px rgba(200,130,10,0.3),0 8px 24px rgba(0,0,0,0.2),0 0 0 2px rgba(200,130,10,0.2);
-}
-.cube.dim{opacity:0.25!important;transform:none}
-.cube-number{
-  position:absolute;top:6px;left:8px;font-size:0.65rem;font-weight:500;
-  color:rgba(74,55,40,0.55);letter-spacing:0.05em;z-index:2;
-}
-.cube::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:8px;
-  background:linear-gradient(180deg,rgba(0,0,0,0.12),transparent);
-  border-radius:6px 6px 0 0;pointer-events:none;
-}
-.cube-floor{
-  height:8px;background:linear-gradient(180deg,var(--wood-light),var(--wood-mid));
-  margin:4px -10px 0;border-radius:0 0 3px 3px;
-  box-shadow:0 3px 8px rgba(0,0,0,0.25);flex-shrink:0;
-}
-
-.spines-container{
-  display:flex;align-items:flex-end;gap:2px;padding:0 2px;
-  min-height:100px;position:relative;flex:1;
-}
-.spine{
-  border-radius:2px 2px 0 0;flex-shrink:0;cursor:pointer;position:relative;
-  transition:transform 0.15s,filter 0.15s;
-  display:flex;align-items:center;justify-content:center;overflow:hidden;
-}
-.spine:hover{transform:translateY(-4px);filter:brightness(1.2);z-index:10}
-.spine.pulse{animation:spinePulse 1.2s ease infinite}
-.spine-text{
-  writing-mode:vertical-rl;transform:rotate(180deg);font-size:8px;
-  font-family:'DM Serif Text',serif;color:rgba(255,255,255,0.85);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-height:92%;
-  padding:2px 0;letter-spacing:0.02em;pointer-events:none;user-select:none;
-}
-.more-badge{
-  font-size:0.6rem;color:var(--ink-light);padding:4px 2px;
-  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;align-self:flex-end;
-}
-
-.spine-tooltip{
-  position:fixed;background:var(--ink);color:var(--cream);border-radius:6px;
-  padding:0.5rem 0.8rem;font-size:0.78rem;pointer-events:none;z-index:1000;
-  max-width:220px;box-shadow:0 4px 20px rgba(0,0,0,0.4);display:none;line-height:1.4;
-}
-.spine-tooltip strong{font-family:'Playfair Display',serif;font-size:0.85rem;display:block;margin-bottom:2px}
-
-.panel-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;
-  display:none;backdrop-filter:blur(2px);
-}
-.panel-overlay.visible{display:block}
-.detail-panel{
-  position:fixed;bottom:0;left:0;right:0;background:var(--cream);
-  border-radius:16px 16px 0 0;padding:1.5rem;z-index:201;max-height:80vh;
-  overflow-y:auto;transform:translateY(100%);
-  transition:transform 0.3s cubic-bezier(0.32,0.72,0,1);-webkit-overflow-scrolling:touch;
-}
-@media(min-width:768px){
-  .detail-panel{
-    left:auto;bottom:0;top:0;right:0;width:min(480px,50vw);
-    border-radius:16px 0 0 16px;max-height:100vh;transform:translateX(100%);
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Miniature Robot | Regan Hines</title>
+<meta property="og:title" content="Miniature Robot | Regan Hines"/>
+<meta property="og:description" content="Still Loading — a weekly AI dispatch. What worked, what satisfies, and the news that actually matters."/>
+<meta property="og:image" content="https://assets.buttondown.email/images/99570eca-633d-422b-868b-24fb58b71b4c.png"/>
+<meta property="og:url" content="https://mini-robot.nz"/>
+<meta property="og:type" content="website"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Miniature Robot | Regan Hines"/>
+<meta name="twitter:description" content="Still Loading — a weekly AI dispatch. What worked, what broke, and the news that actually matters."/>
+<meta name="twitter:image" content="https://assets.buttondown.email/images/99570eca-633d-422b-868b-24fb58b71b4c.png"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          'dark-obsidian': '#050505',
+          'electric-violet': '#8B5CF6',
+        },
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+        },
+        letterSpacing: {
+          'ultra-widest': '0.25em',
+          'technical': '0.1em',
+        }
+      }
+    }
   }
+</script>
+<style>
+.grain-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
 }
-.detail-panel.open{transform:translate(0,0)}
-.panel-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.2rem}
-.panel-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--ink)}
-.panel-subtitle{font-size:0.85rem;color:var(--ink-light);margin-top:0.2rem}
-.panel-close{
-  background:none;border:none;font-size:1.4rem;color:var(--ink-light);
-  cursor:pointer;padding:0.2rem;line-height:1;flex-shrink:0;margin-left:1rem;
+.violet-accent-line {
+  height: 1px; width: 60px;
+  background-color: #8B5CF6;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+  animation: pulse-glow 3s ease-in-out infinite;
 }
-.panel-tabs{display:flex;gap:0;margin-bottom:1.2rem;border-bottom:2px solid var(--cream-dark)}
-.panel-tab{
-  padding:0.5rem 0.9rem;font-size:0.82rem;font-weight:500;cursor:pointer;
-  color:var(--ink-light);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.15s;
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
+  50% { opacity: 0.5; box-shadow: 0 0 20px rgba(139, 92, 246, 0.8), 0 0 40px rgba(139, 92, 246, 0.3); }
 }
-.panel-tab.active{color:var(--amber);border-bottom-color:var(--amber)}
-.panel-books{display:flex;flex-direction:column;gap:0.6rem}
-.book-card{
-  display:flex;align-items:flex-start;gap:0.8rem;padding:0.7rem 0.8rem;
-  border-radius:8px;background:var(--shelf-bg);cursor:pointer;transition:background 0.15s;
+.image-filter {
+  filter: grayscale(0.3) contrast(1.05) brightness(0.9);
 }
-.book-card:hover{background:var(--cream-dark)}
-.book-spine-bar{width:8px;min-height:52px;border-radius:2px;flex-shrink:0;margin-top:2px}
-.book-card-info{flex:1;min-width:0}
-.book-card-title{font-family:'Playfair Display',serif;font-size:0.92rem;font-weight:600;color:var(--ink);line-height:1.3}
-.book-card-author{font-size:0.78rem;color:var(--ink-light);margin-top:0.15rem}
-.book-card-meta{display:flex;gap:0.5rem;align-items:center;margin-top:0.4rem;flex-wrap:wrap}
-.genre-badge{font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:999px;font-weight:500}
-.read-badge{font-size:0.85rem}
-.read-y{color:#2d7a2d}
-.read-n{color:var(--ink-light)}
-.read-p{color:var(--amber)}
 
-.book-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;display:none;
-  align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(3px);
+/* Scroll-triggered fade-in */
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  will-change: opacity, transform;
 }
-.book-overlay.visible{display:flex}
-.book-modal{
-  background:var(--cream);border-radius:16px;padding:2rem;max-width:500px;width:100%;
-  display:flex;gap:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,0.4);position:relative;animation:modalIn 0.25s ease;
+.fade-in-section.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
-.book-modal-spine{width:24px;border-radius:4px;flex-shrink:0;min-height:180px}
-.book-modal-body{flex:1;min-width:0}
-.book-modal-close{
-  position:absolute;top:1rem;right:1rem;background:none;border:none;
-  font-size:1.3rem;color:var(--ink-light);cursor:pointer;
-}
-.book-modal-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:0.4rem}
-.book-modal-author{font-size:0.9rem;color:var(--ink-light);margin-bottom:1rem}
-.book-modal-location{font-size:0.82rem;color:var(--amber);font-weight:500;margin-bottom:0.8rem}
-.book-modal-genre{margin-bottom:1rem}
-.read-toggle{display:flex;gap:0.5rem;flex-wrap:wrap}
-.read-btn{
-  padding:0.5rem 0.9rem;border-radius:6px;border:1.5px solid var(--cream-dark);
-  background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;
-  cursor:pointer;transition:all 0.15s;color:var(--ink-light);
-}
-.read-btn.active-read{background:#2d7a2d;border-color:#2d7a2d;color:#fff}
-.read-btn.active-prog{background:var(--amber);border-color:var(--amber);color:#fff}
-.read-btn.active-unread{background:var(--ink-light);border-color:var(--ink-light);color:#fff}
+.fade-in-section:nth-of-type(1) { transition-delay: 0s; }
+.fade-in-section:nth-of-type(2) { transition-delay: 0.15s; }
+.fade-in-section:nth-of-type(3) { transition-delay: 0.3s; }
+.fade-in-section:nth-of-type(4) { transition-delay: 0.45s; }
 
-@keyframes cubeIn{from{opacity:0;transform:scale(0.92) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-@keyframes spinePulse{0%,100%{filter:brightness(1) drop-shadow(0 0 3px var(--highlight))}50%{filter:brightness(1.4) drop-shadow(0 0 9px var(--highlight))}}
-@keyframes modalIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
-
-@media(max-width:600px){
-  .shelf-frame{padding:12px}
-  .shelf-grid{gap:10px;grid-template-columns:repeat(2,1fr)}
-  .cube{min-height:110px}
-  .spines-container{min-height:72px}
-  .book-modal{flex-direction:column}
-  .book-modal-spine{min-height:0;width:100%;height:16px;border-radius:2px}
+/* Staggered card fade-in (individual cards animate in sequence) */
+.fade-in-card {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
-@media(max-width:380px){.shelf-grid{grid-template-columns:1fr}}
+.fade-in-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Service card hover + tap */
+.service-card {
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+  border: 1px solid transparent;
+  padding: 1.5rem;
+  border-radius: 4px;
+}
+.service-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.15), 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+.service-card:active {
+  transform: scale(0.97);
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+}
+
+/* Pricing card hover + tap */
+.pricing-card {
+  transition: background-color 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
+}
+.pricing-card:hover {
+  background-color: rgba(139, 92, 246, 0.06);
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.08);
+}
+.pricing-card:active {
+  transform: scale(0.98);
+  background-color: rgba(139, 92, 246, 0.1);
+}
+
+/* Hero entrance animations */
+.hero-animate {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: hero-enter 1s ease-out forwards;
+}
+.hero-animate:nth-child(1) { animation-delay: 0.1s; }
+.hero-animate:nth-child(2) { animation-delay: 0.3s; }
+.hero-animate:nth-child(3) { animation-delay: 0.5s; }
+.hero-animate:nth-child(4) { animation-delay: 0.7s; }
+@keyframes hero-enter {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* CTA button shimmer */
+.cta-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.cta-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  animation: shimmer 4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%, 100% { left: -100%; }
+  50% { left: 150%; }
+}
+
+/* Hero gradient mesh background */
+.hero-gradient-mesh {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 600px 400px at 20% 50%, rgba(139, 92, 246, 0.15), transparent),
+    radial-gradient(ellipse 500px 300px at 80% 30%, rgba(139, 92, 246, 0.1), transparent),
+    radial-gradient(ellipse 400px 500px at 60% 80%, rgba(139, 92, 246, 0.08), transparent);
+  animation: mesh-drift 12s ease-in-out infinite alternate;
+}
+@keyframes mesh-drift {
+  0% { opacity: 0.6; transform: scale(1) translate(0, 0); }
+  33% { opacity: 1; transform: scale(1.05) translate(10px, -10px); }
+  66% { opacity: 0.8; transform: scale(0.98) translate(-10px, 5px); }
+  100% { opacity: 1; transform: scale(1.03) translate(5px, -5px); }
+}
+
+/* Hero particle canvas */
+#particle-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
 </style>
 </head>
-<body>
+<body class="bg-dark-obsidian text-zinc-300 font-sans selection:bg-electric-violet selection:text-white overflow-x-hidden">
 
-<header>
-  <h1 class="header-title">The Shelf</h1>
-  <div class="header-underline"></div>
-  <p class="header-subtitle" id="headerSubtitle">books across 12 shelves</p>
-</header>
+<div class="grain-overlay"></div>
 
-<div class="search-wrap">
-  <input class="search-input" type="search" placeholder="Search by title or author…" id="searchInput" autocomplete="off" aria-label="Search books"/>
-  <button class="search-clear" id="searchClear" aria-label="Clear search">×</button>
-</div>
+<!-- Nav -->
 
-<div class="search-results" id="searchResults"></div>
-
-<nav class="filter-bar" id="filterBar" aria-label="Genre filters"></nav>
-
-<div class="extras-row">
-  <button class="btn-surprise" id="btnSurprise">✦ Surprise Me</button>
-  <button class="btn-unread" id="btnUnread">Unread only</button>
-  <span class="filter-count" id="filterCount"></span>
-  <span class="about-tip" tabindex="0">About layers
-    <span class="about-tooltip">Each shelf has 3 layers:<br/><strong>Back</strong> — shorter, dimmer spines<br/><strong>Middle</strong> — medium<br/><strong>Front</strong> — tallest, brightest</span>
-  </span>
-</div>
-
-<div class="stats-bar" id="statsBar"></div>
-
-<main class="shelf-unit">
-  <div class="shelf-frame">
-    <div class="shelf-grid" id="shelfGrid"></div>
-  </div>
-</main>
-
-<div class="spine-tooltip" id="spineTooltip"></div>
-
-<div class="panel-overlay" id="panelOverlay"></div>
-<aside class="detail-panel" id="detailPanel" role="dialog" aria-modal="true" aria-label="Shelf detail">
-  <div class="panel-header">
-    <div>
-      <div class="panel-title" id="panelTitle"></div>
-      <div class="panel-subtitle" id="panelSubtitle"></div>
-    </div>
-    <button class="panel-close" id="panelClose" aria-label="Close panel">×</button>
-  </div>
-  <div class="panel-tabs" id="panelTabs"></div>
-  <div class="panel-books" id="panelBooks"></div>
-</aside>
-
-<div class="book-overlay" id="bookOverlay">
-  <div class="book-modal" id="bookModal">
-    <div class="book-modal-spine" id="modalSpine"></div>
-    <div class="book-modal-body">
-      <button class="book-modal-close" id="modalClose" aria-label="Close">×</button>
-      <div class="book-modal-title" id="modalTitle"></div>
-      <div class="book-modal-author" id="modalAuthor"></div>
-      <div class="book-modal-location" id="modalLocation"></div>
-      <div class="book-modal-genre" id="modalGenre"></div>
-      <div class="read-toggle" id="modalReadToggle"></div>
+<nav class="fixed top-0 w-full z-40 bg-dark-obsidian/80 backdrop-blur-sm border-b border-zinc-900">
+  <div class="max-w-screen-xl mx-auto px-6 h-20 flex items-center justify-between">
+    <div class="font-mono text-xs tracking-ultra-widest uppercase font-medium text-white">Miniature Robot</div>
+    <div class="flex items-center gap-6">
+      <a href="/audit" class="font-mono text-[10px] tracking-ultra-widest uppercase text-zinc-400 hover:text-white transition-colors duration-300">AI Audit</a>
+      <a href="/subscribe" class="font-mono text-[10px] tracking-ultra-widest uppercase text-zinc-400 hover:text-white transition-colors duration-300">Subscribe</a>
+      <div class="violet-accent-line"></div>
     </div>
   </div>
-</div>
+</nav>
+
+<!-- Hero -->
+
+<section class="relative min-h-screen flex flex-col justify-center px-6 pt-20">
+  <div class="hero-gradient-mesh"></div>
+  <canvas id="particle-canvas"></canvas>
+  <div class="max-w-4xl mx-auto w-full relative z-10">
+    <div class="mb-12 hero-animate">
+      <div class="w-px h-24 bg-gradient-to-b from-transparent via-electric-violet to-transparent mx-auto md:mx-0"></div>
+    </div>
+    <h1 class="text-4xl md:text-6xl lg:text-7xl font-light text-white tracking-tight leading-tight mb-8 hero-animate">
+      Fast thinking.<br/>
+      <span class="text-zinc-500 italic">Faster execution.</span>
+    </h1>
+    <p class="text-lg md:text-xl font-light text-zinc-400 max-w-xl leading-relaxed tracking-technical mb-12 hero-animate">
+      Consulting, marketing, and education for ambitious organisations that want to move faster, work smarter, and get more done with less.
+    </p>
+    <a class="inline-block bg-white text-black px-10 py-4 font-mono text-xs tracking-ultra-widest uppercase hover:bg-electric-violet hover:text-white transition-all duration-500 ease-in-out hero-animate cta-shimmer" href="mailto:regan@mini-robot.nz">
+      Let's talk.
+    </a>
+  </div>
+  <div class="absolute bottom-10 right-10 hidden lg:block opacity-20">
+    <div class="text-[10px] font-mono tracking-widest text-zinc-500 uppercase" style="writing-mode: vertical-rl;">
+      Consulting · Marketing · Education
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+
+<section class="py-32 px-6 border-t border-zinc-900 fade-in-section" id="services">
+  <div class="max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-12">
+      <div class="space-y-4 service-card fade-in-card">
+        <span class="font-mono text-[10px] tracking-ultra-widest text-electric-violet uppercase">01</span>
+        <h3 class="text-xl text-white font-light tracking-wide">Consulting</h3>
+        <p class="text-sm text-zinc-500 leading-relaxed font-light">
+          I come into your business, work out what's broken, and fix it. Practical, no fluff. You get a real operator who builds real things, not a slide deck and a follow-up invoice.
+        </p>
+      </div>
+      <div class="space-y-4 service-card fade-in-card">
+        <span class="font-mono text-[10px] tracking-ultra-widest text-electric-violet uppercase">02</span>
+        <h3 class="text-xl text-white font-light tracking-wide">Marketing</h3>
+        <p class="text-sm text-zinc-500 leading-relaxed font-light">
+          I help you build a modern marketing capability that punches well above your weight, without the overhead of a full team.
+        </p>
+      </div>
+      <div class="space-y-4 service-card fade-in-card">
+        <span class="font-mono text-[10px] tracking-ultra-widest text-electric-violet uppercase">03</span>
+        <h3 class="text-xl text-white font-light tracking-wide">Education</h3>
+        <p class="text-sm text-zinc-500 leading-relaxed font-light">
+          Hands-on workshops and coaching for teams who want to actually use AI, not just talk about it. Practical, results-focused. You'll leave knowing how to apply it to your work immediately.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+
+<section class="py-32 px-6 bg-zinc-950/50 border-t border-zinc-900 fade-in-section" id="about">
+  <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-16">
+    <div class="w-full md:w-1/2 relative group">
+      <div class="absolute inset-0 border border-electric-violet/30 translate-x-4 translate-y-4 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-700"></div>
+      <div class="overflow-hidden bg-zinc-900 aspect-[3/4] max-h-96">
+        <img alt="Regan Hines" class="w-full h-full object-cover image-filter" loading="lazy" src="https://images.squarespace-cdn.com/content/v1/68f45bb13c293c41475e9687/6f7bb8a8-b6e9-4570-9156-4e8de4d0ac2c/1669687096929.jpeg"/>
+      </div>
+    </div>
+    <div class="w-full md:w-1/2 space-y-6">
+      <span class="font-mono text-[10px] tracking-ultra-widest text-zinc-500 uppercase">The Operator</span>
+      <h2 class="text-3xl font-light text-white tracking-tight">Regan Hines</h2>
+      <div class="space-y-4 text-zinc-400 font-light leading-relaxed text-sm">
+        <p>
+          Twenty years entering organisations with complex problems, broken workflows, disconnected tools, teams drowning in admin, and building systems that actually work.
+        </p>
+        <p>
+          I move fast, focus on outcomes, and don't stop until the thing works. Based in Christchurch, NZ. Working with organisations who are serious about moving forward.
+        </p>
+      </div>
+      <div class="pt-4">
+        <div class="violet-accent-line"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+
+<section class="py-32 px-6 border-t border-zinc-900 fade-in-section" id="pricing">
+  <div class="max-w-4xl mx-auto">
+    <div class="mb-16">
+      <span class="font-mono text-[10px] tracking-ultra-widest text-zinc-500 uppercase">Pricing</span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-zinc-900">
+      <div class="bg-dark-obsidian p-10 space-y-4 pricing-card fade-in-card">
+        <span class="font-mono text-[10px] tracking-ultra-widest text-electric-violet uppercase">Day Rate</span>
+        <div class="text-3xl font-light text-white">$1,500 to $2,500</div>
+        <div class="font-mono text-[10px] text-zinc-600 uppercase tracking-widest">NZD / day</div>
+        <p class="text-sm text-zinc-500 font-light leading-relaxed pt-2">
+          For defined engagements where you need a senior operator on the ground. Audit, build, fix, train. Whatever the problem is.
+        </p>
+      </div>
+      <div class="bg-electric-violet/10 border border-electric-violet/20 p-10 space-y-4 pricing-card fade-in-card">
+        <span class="font-mono text-[10px] tracking-ultra-widest text-electric-violet uppercase">Monthly Retainer</span>
+        <div class="text-3xl font-light text-white">$3,000 to $8,000</div>
+        <div class="font-mono text-[10px] text-zinc-600 uppercase tracking-widest">NZD / month</div>
+        <p class="text-sm text-zinc-500 font-light leading-relaxed pt-2">
+          Ongoing advisory and implementation. Your operator, available when you need them. Priced on scope and commitment.
+        </p>
+      </div>
+      <div class="bg-dark-obsidian p-10 space-y-4 pricing-card fade-in-card">
+        <span class="font-mono text-[10px] tracking-ultra-widest text-electric-violet uppercase">Project</span>
+        <div class="text-3xl font-light text-white">$8,000 to $25,000</div>
+        <div class="font-mono text-[10px] text-zinc-600 uppercase tracking-widest">NZD / fixed scope</div>
+        <p class="text-sm text-zinc-500 font-light leading-relaxed pt-2">
+          A defined outcome with a fixed price. Systems audit, marketing stack build, process redesign. Clean in, clean out.
+        </p>
+      </div>
+      <div class="bg-dark-obsidian p-10 space-y-4 pricing-card fade-in-card">
+        <span class="font-mono text-[10px] tracking-ultra-widest text-electric-violet uppercase">Workshop</span>
+        <div class="text-3xl font-light text-white">$3,500 to $5,000</div>
+        <div class="font-mono text-[10px] text-zinc-600 uppercase tracking-widest">NZD / day</div>
+        <p class="text-sm text-zinc-500 font-light leading-relaxed pt-2">
+          Full-day training for your team. Practical, hands-on, tailored to your context. People leave knowing how to apply what they've learned immediately.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+
+<footer class="py-24 px-6 text-center border-t border-zinc-900 fade-in-section">
+  <div class="max-w-xl mx-auto space-y-12">
+    <h3 class="text-2xl font-light text-white tracking-wide">Ready to build something?</h3>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a class="inline-block border border-zinc-800 px-12 py-5 font-mono text-xs tracking-ultra-widest uppercase hover:border-electric-violet hover:text-white transition-all duration-700 ease-in-out" href="mailto:regan@mini-robot.nz">
+        regan@mini-robot.nz
+      </a>
+      <a class="inline-block border border-electric-violet/30 px-12 py-5 font-mono text-xs tracking-ultra-widest uppercase text-electric-violet hover:bg-electric-violet hover:text-white transition-all duration-700 ease-in-out" href="/subscribe">
+        Subscribe
+      </a>
+    </div>
+    <div class="pt-12">
+      <div class="font-mono text-[9px] tracking-[0.4em] text-zinc-600 uppercase">
+        &copy; 2026 Miniature Robot &middot; Christchurch, New Zealand &middot; Built for outcomes. Not excuses.
+      </div>
+    </div>
+  </div>
+</footer>
 
 <script>
-const BOOKS = [{"title":"The Butcher's Masquerade","author":"Matt Dinniman","type":"Fiction","genre":"Fantasy - LitRPG","read":"N","shelf":"Shelf 2","layer":"3"},{"title":"The Dungeon Anarchist's Cookbook","author":"Matt Dinniman","type":"Fiction","genre":"Fantasy - LitRPG","read":"N","shelf":"Shelf 2","layer":"3"},{"title":"Carl's Doomsday Scenario","author":"Matt Dinniman","type":"Fiction","genre":"Fantasy - LitRPG","read":"N","shelf":"Shelf 2","layer":"3"},{"title":"Eleanor Oliphant is Completely Fine","author":"Gail Honeyman","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 2","layer":"2"},{"title":"Jim Henson: The Biography","author":"Jim Henson","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 1","layer":"2"},{"title":"The Anglo-Saxons","author":"Marc Morris","type":"Non Fiction","genre":"History - English","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"My Friends","author":"Fredrik Backman","type":"Fiction","genre":"Fiction","read":"N","shelf":"Shelf 2","layer":"1"},{"title":"The Tale of the Duelling Neurosurgeons","author":"Sam Kean","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"The Coming Wave","author":"Mustafa Suleyman","type":"Non Fiction","genre":"Technology","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"The Anarchy","author":"William Dalrymple","type":"Non Fiction","genre":"History - India","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"Meditations","author":"Marcus Aurelius","type":"Non Fiction","genre":"Philosophy","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"A Short History of Progress","author":"Ronald Wright","type":"Non Fiction","genre":"History - Global","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"Mensa Train Your Brain: Memory","author":"Various","type":"Non Fiction","genre":"Reference","read":"N","shelf":"Shelf 2","layer":"1"},{"title":"Paris: A Literary Anthology","author":"Zackary Seager","type":"Non Fiction","genre":"Anthology","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"Odysseus Abroad","author":"Amit Chaudhuri","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"Never Let Me Go","author":"Kazuo Ishiguro","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"Oranges Are Not the Only Fruit","author":"Jeanette Winterson","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"Braiding Sweetgrass","author":"Robin Wall Kimmerer","type":"Non Fiction","genre":"Nature","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"Intermezzo","author":"Sally Rooney","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 1","layer":"2"},{"title":"Revolt: The Worldwide Uprising Against Globalisation","author":"Nadav Eyal","type":"Non Fiction","genre":"History - Global","read":"N","shelf":"Shelf 1","layer":"2"},{"title":"Gliff","author":"Ali Smith","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 1","layer":"2"},{"title":"Seven and a Half Lessons About the Brain","author":"Lisa Feldman Barrett","type":"Non Fiction","genre":"Neuroscience","read":"N","shelf":"Shelf 1","layer":"3"},{"title":"The Checklist Manifesto","author":"Atul Gawande","type":"Non Fiction","genre":"Productivity","read":"N","shelf":"Shelf 1","layer":"3"},{"title":"Alias Grace","author":"Margaret Atwood","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 1","layer":"3"},{"title":"The Belgariad: Pawn of Prophecy","author":"David Eddings","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 1","layer":"3"},{"title":"The Power of Positive Thinking","author":"Norman Vincent Peale","type":"Non Fiction","genre":"Psychology","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"The Let Them Theory","author":"Mel Robbins","type":"Non Fiction","genre":"Self Help","read":"N","shelf":"Shelf 2","layer":"1"},{"title":"Eleanor Oliphant is Completely Fine","author":"Gail Honeyman","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 2","layer":"2"},{"title":"Reimagining Capitalism in a World on Fire","author":"Rebecca Henderson","type":"Non Fiction","genre":"Business","read":"N","shelf":"Shelf 2","layer":"2"},{"title":"Remarkably Bright Creatures","author":"Shelby Van Pelt","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 2","layer":"2"},{"title":"Piranesi","author":"Susanna Clarke","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 2","layer":"2"},{"title":"Time's Convert","author":"Deborah Harkness","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 1","layer":"3"},{"title":"Dungeon Crawler Carl Book 1","author":"Matt Dinniman","type":"Fiction","genre":"Fantasy - LitRPG","read":"N","shelf":"Shelf 2","layer":"3"},{"title":"Dungeon Crawler Carl Book 2","author":"Matt Dinniman","type":"Fiction","genre":"Fantasy - LitRPG","read":"N","shelf":"Shelf 2","layer":"3"},{"title":"Dungeon Crawler Carl Book 3","author":"Matt Dinniman","type":"Fiction","genre":"Fantasy - LitRPG","read":"N","shelf":"Shelf 2","layer":"3"},{"title":"Dungeon Crawler Carl Book 4","author":"Matt Dinniman","type":"Fiction","genre":"Fantasy - LitRPG","read":"N","shelf":"Shelf 2","layer":"3"},{"title":"Dungeon Crawler Carl Book 5","author":"Matt Dinniman","type":"Fiction","genre":"Fantasy - LitRPG","read":"N","shelf":"Shelf 2","layer":"3"},{"title":"Dungeon Crawler Carl Book 6","author":"Matt Dinniman","type":"Fiction","genre":"Fantasy - LitRPG","read":"N","shelf":"Shelf 2","layer":"3"},{"title":"Beautyland","author":"Marie-Helene Bertino","type":"Fiction","genre":"Sci-Fi","read":"N","shelf":"Shelf 2","layer":"1"},{"title":"I Cheerfully Refuse","author":"Leif Enger","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 2","layer":"2"},{"title":"The Life and Times of the Thunderbolt Kid","author":"Bill Bryson","type":"Non Fiction","genre":"Memoir","read":"N","shelf":"Shelf 8","layer":"2"},{"title":"The Berlin Novels","author":"Christopher Isherwood","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 1","layer":"1"},{"title":"East of Eden","author":"John Steinbeck","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 1","layer":"2"},{"title":"Cat's Cradle","author":"Kurt Vonnegut","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 1","layer":"2"},{"title":"Down and Out in Paris and London","author":"George Orwell","type":"Non Fiction","genre":"Memoir","read":"N","shelf":"Shelf 2","layer":"2"},{"title":"Rivers of London","author":"Ben Aaronovitch","type":"Fiction","genre":"Fantasy","read":"N","shelf":"Shelf 2","layer":"2"},{"title":"Switch: How to Change Things When Change Is Hard","author":"Chip and Dan Heath","type":"Non Fiction","genre":"Business","read":"N","shelf":"Shelf 2","layer":"2"},{"title":"Adventures of a Young Naturalist","author":"David Attenborough","type":"Non Fiction","genre":"Memoir","read":"N","shelf":"Shelf 2","layer":"1"},{"title":"The Cruel Stars","author":"John Birmingham","type":"Fiction","genre":"Sci-Fi","read":"N","shelf":"Shelf 2","layer":"1"},{"title":"The Plantagenets","author":"Dan Jones","type":"Non Fiction","genre":"History - English","read":"N","shelf":"Shelf 2","layer":"1"},{"title":"Wanderlust","author":"Reid Mitenbuler","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 2","layer":"1"},{"title":"London: The Novel","author":"Edward Rutherfurd","type":"Fiction","genre":"Historical Fiction","read":"N","shelf":"Shelf 2","layer":"1"},{"title":"The Book of Roads and Kingdoms","author":"Richard Fidler","type":"Non Fiction","genre":"History - Middle East","read":"N","shelf":"Shelf 2","layer":"1"},{"title":"The Great War for Civilisation","author":"Robert Fisk","type":"Non Fiction","genre":"History - Middle East","read":"N","shelf":"Shelf 1","layer":"2"},{"title":"Hamnet","author":"Maggie O'Farrell","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 1","layer":"3"},{"title":"The Wren, The Wren","author":"Anne Enright","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 1","layer":"3"},{"title":"Kairos","author":"Jenny Erpenbeck","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 1","layer":"3"},{"title":"Python's Kiss: Stories","author":"Louise Erdrich","type":"Fiction","genre":"Short Stories","read":"N","shelf":"Shelf 1","layer":"3"},{"title":"Glyph","author":"Ali Smith","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 1","layer":"3"},{"title":"The Dutch House","author":"Ann Patchett","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 2","layer":"2"},{"title":"Finding Hildasay","author":"Christian Lewis","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 2","layer":"2"},{"title":"Foster","author":"Claire Keegan","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 1","layer":"3"},{"title":"I Who Have Never Known Men","author":"Jacqueline Harpman","type":"Fiction","genre":"Classics","read":"Y","shelf":"Shelf 1","layer":"3"},{"title":"My Year in Paris with Gertrude Stein","author":"Deborah Levy","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 1","layer":"3"},{"title":"Consider the Lobster and Other Essays","author":"David Foster Wallace","type":"Non Fiction","genre":"Essays","read":"Y","shelf":"Shelf 1","layer":"3"},{"title":"Kingsbridge 1792: The Armour of Light","author":"Ken Follett","type":"Fiction","genre":"Historical Fiction","read":"N","shelf":"Shelf 2","layer":"2"},{"title":"Queen of Storms","author":"Raymond E. Feist","type":"Fiction","genre":"Fantasy","read":"N","shelf":"Shelf 4","layer":"2"},{"title":"Master of Furies","author":"Raymond E. Feist","type":"Fiction","genre":"Fantasy","read":"N","shelf":"Shelf 6","layer":"2"},{"title":"The Full Moon Coffee Shop","author":"Mai Mochizuki","type":"Fiction","genre":"Japanese Fiction","read":"Y","shelf":"Shelf 5","layer":"1"},{"title":"Grant","author":"Ron Chernow","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 4","layer":"3"},{"title":"Harry Potter and the Philosopher's Stone (Illustrated)","author":"J.K. Rowling","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 3","layer":"3"},{"title":"Harry Potter and the Chamber of Secrets (Illustrated)","author":"J.K. Rowling","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 3","layer":"3"},{"title":"Harry Potter and the Prisoner of Azkaban (Illustrated)","author":"J.K. Rowling","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 3","layer":"3"},{"title":"Harry Potter and the Goblet of Fire (Illustrated)","author":"J.K. Rowling","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 3","layer":"3"},{"title":"How to Be You: Simone de Beauvoir","author":"Skye Cleary","type":"Non Fiction","genre":"Biography","read":"Y","shelf":"Shelf 5","layer":"1"},{"title":"My Favourite Things","author":"Maira Kalman","type":"Non Fiction","genre":"Memoir","read":"Y","shelf":"Shelf 4","layer":"3"},{"title":"Agincourt: Battle of the Scarred King","author":"Michael Livingston","type":"Non Fiction","genre":"History - English","read":"N","shelf":"Shelf 5","layer":"3"},{"title":"Best Day Walks: New Zealand","author":"Lonely Planet","type":"Non Fiction","genre":"Travel","read":"Y","shelf":"Shelf 10","layer":"1"},{"title":"A Spell of Good Things","author":"Ayobami Adebayo","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 4","layer":"2"},{"title":"Super-Infinite: The Transformations of John Donne","author":"Katherine Rundell","type":"Non Fiction","genre":"Biography","read":"Y","shelf":"Shelf 6","layer":"2"},{"title":"Light Thickens","author":"Ngaio Marsh","type":"Fiction","genre":"Mystery","read":"Y","shelf":"Shelf 4","layer":"2"},{"title":"The Baby Dragon Café","author":"A.T. Qureshi","type":"Fiction","genre":"Cozy Fantasy","read":"Y","shelf":"Shelf 6","layer":"2"},{"title":"The Blackbird Oracle","author":"Deborah Harkness","type":"Fiction","genre":"Urban Fantasy","read":"Y","shelf":"Shelf 5","layer":"1"},{"title":"Katabasis","author":"R.F. Kuang","type":"Fiction","genre":"Urban Fantasy","read":"Y","shelf":"Shelf 5","layer":"3"},{"title":"Orchard: Growing and Cooking Fruit","author":"James Hunter","type":"Non Fiction","genre":"Nature","read":"N","shelf":"Shelf 10","layer":"1"},{"title":"How to Build a Billion Dollar Business","author":"Radek Sali","type":"Non Fiction","genre":"Business","read":"N","shelf":"Shelf 6","layer":"1"},{"title":"Legends and Lattes","author":"Travis Baldree","type":"Fiction","genre":"Cozy Fantasy","read":"Y","shelf":"Shelf 5","layer":"2"},{"title":"Emily Wilde's Encyclopaedia of Faeries","author":"Heather Fawcett","type":"Fiction","genre":"Urban Fantasy","read":"Y","shelf":"Shelf 5","layer":"2"},{"title":"I Am Homeless If This Is Not My Home","author":"Lorrie Moore","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 5","layer":"2"},{"title":"Tunisgrad: Victory in Africa","author":"Saul David","type":"Non Fiction","genre":"History - WW2","read":"N","shelf":"Shelf 6","layer":"3"},{"title":"Roman Stories","author":"Jhumpa Lahiri","type":"Fiction","genre":"Short Stories","read":"Y","shelf":"Shelf 5","layer":"1"},{"title":"She and Her Cat","author":"Makoto Shinkai","type":"Fiction","genre":"Japanese Fiction","read":"Y","shelf":"Shelf 5","layer":"2"},{"title":"The Maniac","author":"Benjamin Labatut","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 5","layer":"1"},{"title":"Katherine Mansfield: The Collected Short Stories","author":"Katherine Mansfield","type":"Fiction","genre":"Short Stories","read":"N","shelf":"Shelf 4","layer":"1"},{"title":"Persuasion","author":"Jane Austen","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 5","layer":"1"},{"title":"The Gene: An Intimate History","author":"Siddhartha Mukherjee","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 5","layer":"1"},{"title":"Madame Bovary","author":"Gustave Flaubert","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 5","layer":"1"},{"title":"The Woman in White","author":"Wilkie Collins","type":"Fiction","genre":"Gothic","read":"N","shelf":"Shelf 5","layer":"1"},{"title":"Committed: A Memoir of Finding Meaning in Madness","author":"Suzanne Scanlon","type":"Non Fiction","genre":"Memoir","read":"N","shelf":"Shelf 6","layer":"1"},{"title":"Unruly: A History of England's Kings and Queens","author":"David Mitchell","type":"Non Fiction","genre":"History - English","read":"N","shelf":"Shelf 6","layer":"1"},{"title":"Fear: An Alternative History of the World","author":"Robert Peckham","type":"Non Fiction","genre":"History - Global","read":"N","shelf":"Shelf 4","layer":"3"},{"title":"The Wager","author":"David Grann","type":"Non Fiction","genre":"History - Naval","read":"N","shelf":"Shelf 4","layer":"3"},{"title":"The Memoirs of Stockholm Sven","author":"Nathaniel Ian Miller","type":"Fiction","genre":"Adventure","read":"N","shelf":"Shelf 5","layer":"3"},{"title":"Steinbeck: A Life in Letters","author":"John Steinbeck","type":"Non Fiction","genre":"Letters","read":"N","shelf":"Shelf 3","layer":"1"},{"title":"Cat's Eye","author":"Margaret Atwood","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 5","layer":"2"},{"title":"The Hound of the Baskervilles","author":"Arthur Conan Doyle","type":"Fiction","genre":"Mystery","read":"Y","shelf":"Shelf 1","layer":"3"},{"title":"Hive 1","author":"Dan Abnett","type":"Fiction","genre":"Warhammer","read":"N","shelf":"Shelf 3","layer":"3"},{"title":"There Is No Antimemetics Division","author":"qntm","type":"Fiction","genre":"Sci-Fi","read":"N","shelf":"Shelf 3","layer":"2"},{"title":"Band of Brothers","author":"Stephen Ambrose","type":"Non Fiction","genre":"History - WW2","read":"N","shelf":"Shelf 6","layer":"3"},{"title":"The Robber Bride","author":"Margaret Atwood","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 3","layer":"2"},{"title":"The Long Valley: Stories","author":"John Steinbeck","type":"Fiction","genre":"Short Stories","read":"N","shelf":"Shelf 3","layer":"2"},{"title":"The Amberglow Candy Store","author":"Hiyoko Kurisu","type":"Fiction","genre":"Japanese Fiction","read":"Y","shelf":"Shelf 11","layer":"1"},{"title":"The Thursday Murder Club","author":"Richard Osman","type":"Fiction","genre":"Mystery","read":"Y","shelf":"Shelf 11","layer":"1"},{"title":"The Unlikely Pilgrimage of Harold Fry","author":"Rachel Joyce","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 11","layer":"1"},{"title":"Selected Letters: Madame de Sévigné","author":"Madame de Sévigné","type":"Non Fiction","genre":"Letters","read":"N","shelf":"Shelf 11","layer":"1"},{"title":"The House in the Cerulean Sea","author":"TJ Klune","type":"Fiction","genre":"Cozy Fantasy","read":"Y","shelf":"Shelf 11","layer":"1"},{"title":"The Song of Achilles","author":"Madeline Miller","type":"Fiction","genre":"Greek Myth","read":"Y","shelf":"Shelf 11","layer":"1"},{"title":"A Christmas Carol","author":"Charles Dickens","type":"Fiction","genre":"Short Stories","read":"Y","shelf":"Shelf 9","layer":"1"},{"title":"The Duke","author":"Philip Guedalla","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 11","layer":"1"},{"title":"Dune Messiah","author":"Frank Herbert","type":"Fiction","genre":"Sci-Fi","read":"N","shelf":"Shelf 8","layer":"3"},{"title":"Dune","author":"Frank Herbert","type":"Fiction","genre":"Sci-Fi","read":"N","shelf":"Shelf 7","layer":"2"},{"title":"Infinity Gate","author":"M.R. Carey","type":"Fiction","genre":"Sci-Fi","read":"Y","shelf":"Shelf 7","layer":"2"},{"title":"Red Notice","author":"Bill Browder","type":"Non Fiction","genre":"History - Global","read":"N","shelf":"Shelf 11","layer":"1"},{"title":"Empire of the Vampire","author":"Jay Kristoff","type":"Fiction","genre":"Fantasy - Vampire","read":"Y","shelf":"Shelf 11","layer":"1"},{"title":"Prince Caspian","author":"C.S. Lewis","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 3","layer":"3"},{"title":"The Madness of Grief","author":"Richard Coles","type":"Non Fiction","genre":"Memoir","read":"Y","shelf":"Shelf 4","layer":"3"},{"title":"What You Are Looking For Is in the Library","author":"Michiko Aoyama","type":"Fiction","genre":"Japanese Fiction","read":"Y","shelf":"Shelf 11","layer":"1"},{"title":"Valhalla Rising","author":"Clive Cussler","type":"Fiction","genre":"Adventure","read":"N","shelf":"Shelf 7","layer":"2"},{"title":"The Redemption of Althalus","author":"David Eddings","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 4","layer":"1"},{"title":"Hitler's Field Marshals and Their Battles","author":"Samuel W. Mitcham","type":"Non Fiction","genre":"History - WW2","read":"N","shelf":"Shelf 4","layer":"1"},{"title":"The Complete Stories: Katherine Mansfield","author":"Katherine Mansfield","type":"Fiction","genre":"Short Stories","read":"N","shelf":"Shelf 4","layer":"1"},{"title":"Complete Works of Oscar Wilde","author":"Oscar Wilde","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 4","layer":"1"},{"title":"The Passage","author":"Justin Cronin","type":"Fiction","genre":"Dystopian","read":"N","shelf":"Shelf 4","layer":"1"},{"title":"Kipling: Selected Works","author":"Rudyard Kipling","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 4","layer":"1"},{"title":"A People's History of Quebec","author":"Jacques Lacoursière","type":"Non Fiction","genre":"History - Canada","read":"N","shelf":"Shelf 7","layer":"2"},{"title":"The In-Between Bookstore","author":"Edward Underhill","type":"Fiction","genre":"Cozy Fantasy","read":"N","shelf":"Shelf 8","layer":"3"},{"title":"Killers of the Flower Moon","author":"David Grann","type":"Non Fiction","genre":"History - USA","read":"N","shelf":"Shelf 8","layer":"3"},{"title":"Dictionary of Foreign Phrases and Classical Quotations","author":"H.P. Jones","type":"Non Fiction","genre":"Reference","read":"N","shelf":"Shelf 7","layer":"2"},{"title":"On the Trail of Genghis Khan","author":"Tim Cope","type":"Non Fiction","genre":"Memoir","read":"N","shelf":"Shelf 7","layer":"2"},{"title":"Tanglewreck","author":"Jeanette Winterson","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 7","layer":"2"},{"title":"Orwell's Roses","author":"Rebecca Solnit","type":"Non Fiction","genre":"Biography","read":"Y","shelf":"Shelf 7","layer":"2"},{"title":"The Adventures of Huckleberry Finn","author":"Mark Twain","type":"Fiction","genre":"Classics","read":"Y","shelf":"Shelf 7","layer":"2"},{"title":"Harry Potter and the Cursed Child","author":"Jack Thorne","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 7","layer":"2"},{"title":"Great Goddesses","author":"Nikita Gill","type":"Poetry","genre":"Greek Myth","read":"Y","shelf":"Shelf 7","layer":"3"},{"title":"The Peninsular War Atlas","author":"Nick Lipscombe","type":"Non Fiction","genre":"Napoleonic","read":"Y","shelf":"Shelf 12","layer":"1"},{"title":"Candela Obscura: Core Rulebook","author":"Darrington Press","type":"Game","genre":"Gaming","read":"N","shelf":"Shelf 11","layer":"2"},{"title":"Philip and Alexander: Kings and Conquerors","author":"Adrian Goldsworthy","type":"Non Fiction","genre":"Biography","read":"Y","shelf":"Shelf 9","layer":"3"},{"title":"The Psilocybin Mushroom Bible","author":"Virginia Haze","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 10","layer":"1"},{"title":"Leopard 1 Main Battle Tank","author":"Haynes","type":"Non Fiction","genre":"Reference","read":"N","shelf":"Shelf 10","layer":"2"},{"title":"Warhammer Age of Sigmar: Slaves to Darkness","author":"Warhammer","type":"Warhammer","genre":"Warhammer","read":"N","shelf":"Shelf 10","layer":"2"},{"title":"Blades in the Dark","author":"John Harper","type":"Game","genre":"Gaming","read":"N","shelf":"Shelf 11","layer":"2"},{"title":"All Star Superman","author":"DC","type":"Comics","genre":"Graphic Novel","read":"N","shelf":"Shelf 11","layer":"2"},{"title":"Batman: One Bad Day - The Riddler","author":"DC","type":"Comics","genre":"Graphic Novel","read":"N","shelf":"Shelf 11","layer":"2"},{"title":"Lovecraftian Horrors: Field Observer's Handbook","author":"Sandy Petersen","type":"Fiction","genre":"Horror","read":"N","shelf":"Shelf 11","layer":"2"},{"title":"Batman: The Killing Joke","author":"Alan Moore","type":"Comics","genre":"Graphic Novel","read":"N","shelf":"Shelf 11","layer":"2"},{"title":"Call of Cthulhu Regency","author":"Andrew Peregrine","type":"Game","genre":"Gaming","read":"N","shelf":"Shelf 11","layer":"2"},{"title":"Call of Cthulhu Keeper Rulebook","author":"Sandy Petersen","type":"Game","genre":"Gaming","read":"N","shelf":"Shelf 11","layer":"2"},{"title":"Call of Cthulhu: Doors to Darkness","author":"Chaosium","type":"Game","genre":"Gaming","read":"N","shelf":"Shelf 11","layer":"2"},{"title":"Atlas: The Story of Pa Salt","author":"Lucinda Riley","type":"Fiction","genre":"Historical Fiction","read":"Y","shelf":"Shelf 7","layer":"1"},{"title":"Seconds (Graphic Novel)","author":"Bryan Lee O'Malley","type":"Fiction","genre":"Graphic Novel","read":"N","shelf":"Shelf 7","layer":"3"},{"title":"Atlas of the Heart","author":"Brené Brown","type":"Non Fiction","genre":"Psychology","read":"Y","shelf":"Shelf 10","layer":"1"},{"title":"The Mongol Conquests","author":"Carl Fredrik Sverdrup","type":"Non Fiction","genre":"History - Asia","read":"Y","shelf":"Shelf 7","layer":"3"},{"title":"Trafalgar","author":"John Terraine","type":"Non Fiction","genre":"Napoleonic","read":"Y","shelf":"Shelf 10","layer":"1"},{"title":"Tal'Dorei Campaign Setting Reborn","author":"Darrington Press","type":"DnD","genre":"Gaming","read":"N","shelf":"Shelf 11","layer":"2"},{"title":"Supergirl: Woman of Tomorrow","author":"DC","type":"Comics","genre":"Graphic Novel","read":"Y","shelf":"Shelf 11","layer":"2"},{"title":"Batman/Catwoman: The Wedding Album","author":"DC","type":"Comics","genre":"Graphic Novel","read":"N","shelf":"Shelf 11","layer":"2"},{"title":"Stone Mattress: Nine Wicked Tales","author":"Margaret Atwood","type":"Fiction","genre":"Short Stories","read":"Y","shelf":"Shelf 11","layer":"1"},{"title":"The Seven Sisters","author":"Lucinda Riley","type":"Fiction","genre":"Historical Fiction","read":"Y","shelf":"Shelf 7","layer":"1"},{"title":"The Storm Sister","author":"Lucinda Riley","type":"Fiction","genre":"Historical Fiction","read":"Y","shelf":"Shelf 7","layer":"1"},{"title":"The Shadow Sister","author":"Lucinda Riley","type":"Fiction","genre":"Historical Fiction","read":"Y","shelf":"Shelf 7","layer":"1"},{"title":"The Pearl Sister","author":"Lucinda Riley","type":"Fiction","genre":"Historical Fiction","read":"Y","shelf":"Shelf 7","layer":"1"},{"title":"The Moon Sister","author":"Lucinda Riley","type":"Fiction","genre":"Historical Fiction","read":"Y","shelf":"Shelf 7","layer":"1"},{"title":"The Sun Sister","author":"Lucinda Riley","type":"Fiction","genre":"Historical Fiction","read":"Y","shelf":"Shelf 7","layer":"1"},{"title":"The Missing Sister","author":"Lucinda Riley","type":"Fiction","genre":"Historical Fiction","read":"Y","shelf":"Shelf 7","layer":"1"},{"title":"A Fatal Thing Happened on the Way to the Forum","author":"Emma Southon","type":"Non Fiction","genre":"History - Rome","read":"N","shelf":"Shelf 8","layer":"3"},{"title":"The Body Keeps the Score","author":"Bessel van der Kolk","type":"Non Fiction","genre":"Psychology","read":"N","shelf":"Shelf 8","layer":"3"},{"title":"China: A History","author":"John Keay","type":"Non Fiction","genre":"History - China","read":"N","shelf":"Shelf 8","layer":"3"},{"title":"Tomorrow, and Tomorrow, and Tomorrow","author":"Gabrielle Zevin","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 8","layer":"3"},{"title":"Anna Karenina","author":"Leo Tolstoy","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 8","layer":"3"},{"title":"The Acts of King Arthur and His Noble Knights","author":"John Steinbeck","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 3","layer":"1"},{"title":"Travellers in the Third Reich","author":"Julia Boyd","type":"Non Fiction","genre":"History - WW2","read":"Y","shelf":"Shelf 6","layer":"3"},{"title":"The Help","author":"Kathryn Stockett","type":"Fiction","genre":"Historical Fiction","read":"N","shelf":"Shelf 8","layer":"2"},{"title":"The Physician's Daughter","author":"Martha Conway","type":"Fiction","genre":"Historical Fiction","read":"N","shelf":"Shelf 8","layer":"2"},{"title":"W. Somerset Maugham: Collected Short Stories Vol. 2","author":"W. Somerset Maugham","type":"Fiction","genre":"Short Stories","read":"N","shelf":"Shelf 3","layer":"3"},{"title":"A Trillion Trees","author":"Fred Pearce","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 8","layer":"2"},{"title":"Yellowface","author":"Rebecca F. Kuang","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 8","layer":"2"},{"title":"Mrs Dalloway","author":"Virginia Woolf","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 5","layer":"2"},{"title":"Selected Short Stories: Virginia Woolf","author":"Virginia Woolf","type":"Fiction","genre":"Short Stories","read":"N","shelf":"Shelf 8","layer":"3"},{"title":"Death: As Told by a Sapien to a Neanderthal","author":"Juan Millás and Arsuaga","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 8","layer":"2"},{"title":"The Creative Act: A Way of Being","author":"Rick Rubin","type":"Non Fiction","genre":"Creativity","read":"N","shelf":"Shelf 9","layer":"3"},{"title":"The Winter of Our Discontent","author":"John Steinbeck","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 3","layer":"1"},{"title":"Troublesome Words","author":"Bill Bryson","type":"Non Fiction","genre":"Reference","read":"N","shelf":"Shelf 2","layer":"2"},{"title":"On the Road","author":"Jack Kerouac","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 5","layer":"2"},{"title":"Samurai William","author":"Giles Milton","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 5","layer":"2"},{"title":"A Fellowship of Bakers and Magic","author":"J. Penner","type":"Fiction","genre":"Cozy Fantasy","read":"N","shelf":"Shelf 5","layer":"2"},{"title":"Great Short Works of Stephen Crane","author":"Stephen Crane","type":"Fiction","genre":"Short Stories","read":"N","shelf":"Shelf 3","layer":"2"},{"title":"The Elements of Marie Curie","author":"Dava Sobel","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 8","layer":"2"},{"title":"The Women","author":"Kristin Hannah","type":"Fiction","genre":"Historical Fiction","read":"N","shelf":"Shelf 8","layer":"2"},{"title":"The Principles of Uncertainty","author":"Maira Kalman","type":"Non Fiction","genre":"Memoir","read":"Y","shelf":"Shelf 4","layer":"2"},{"title":"Tuesdays with Morrie","author":"Mitch Albom","type":"Non Fiction","genre":"Biography","read":"Y","shelf":"Shelf 4","layer":"2"},{"title":"The Bee Sting","author":"Paul Murray","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 4","layer":"2"},{"title":"All the Little Bird-Hearts","author":"Viktoria Lloyd-Barlow","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 5","layer":"3"},{"title":"Strangers to Ourselves","author":"Rachel Aviv","type":"Non Fiction","genre":"Psychology","read":"Y","shelf":"Shelf 5","layer":"3"},{"title":"Western Lane","author":"Chetna Maroo","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 8","layer":"1"},{"title":"This Other Eden","author":"Paul Harding","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 8","layer":"1"},{"title":"Europe in Vienna: The Congress of Vienna","author":"Agnes Acord","type":"Non Fiction","genre":"Napoleonic","read":"N","shelf":"Shelf 10","layer":"1"},{"title":"How to Read European Armour","author":"Various","type":"Non Fiction","genre":"Reference","read":"N","shelf":"Shelf 10","layer":"1"},{"title":"Dracula","author":"Bram Stoker","type":"Fiction","genre":"Gothic","read":"Y","shelf":"Shelf 5","layer":"3"},{"title":"Old Babes in the Wood","author":"Margaret Atwood","type":"Fiction","genre":"Short Stories","read":"Y","shelf":"Shelf 5","layer":"3"},{"title":"Graphic Novel Dune Book 1","author":"Frank Herbert (adapted)","type":"Fiction","genre":"Graphic Novel","read":"Y","shelf":"Shelf 10","layer":"2"},{"title":"Graphic Novel Dune Book 2","author":"Frank Herbert (adapted)","type":"Fiction","genre":"Graphic Novel","read":"Y","shelf":"Shelf 10","layer":"2"},{"title":"Marvel Encyclopedia","author":"Marvel","type":"Non Fiction","genre":"Reference","read":"N","shelf":"Shelf 10","layer":"1"},{"title":"The World of Ice and Fire","author":"George R.R. Martin","type":"Fiction","genre":"Reference","read":"N","shelf":"Shelf 10","layer":"1"},{"title":"Star Wars Rogue One: Ultimate Visual Guide","author":"Pablo Hidalgo","type":"Non Fiction","genre":"Reference","read":"N","shelf":"Shelf 10","layer":"1"},{"title":"Warhammer: The Game of Fantasy Battles","author":"Warhammer","type":"Warhammer","genre":"Warhammer","read":"N","shelf":"Shelf 10","layer":"1"},{"title":"Dice Men: The Story of Games Workshop","author":"Ian Livingstone","type":"Non Fiction","genre":"Memoir","read":"N","shelf":"Shelf 11","layer":"2"},{"title":"Warpaint Armour 1941-1945","author":"David Grummitt","type":"Non Fiction","genre":"History - WW2","read":"N","shelf":"Shelf 10","layer":"1"},{"title":"Warhammer 40,000 Psychic Awakening: Pariah","author":"Warhammer","type":"Warhammer","genre":"Warhammer","read":"N","shelf":"Shelf 10","layer":"2"},{"title":"Red Comet: The Short Life and Blazing Art of Sylvia Plath","author":"Heather Clark","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 7","layer":"3"},{"title":"Cooked: A Natural History of Transformation","author":"Michael Pollan","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 7","layer":"3"},{"title":"Wonderworks","author":"Angus Fletcher","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 7","layer":"3"},{"title":"Brainscapes","author":"Rebecca Schwarzlose","type":"Non Fiction","genre":"Neuroscience","read":"N","shelf":"Shelf 7","layer":"3"},{"title":"Ernest Hemingway: The Collected Stories","author":"Ernest Hemingway","type":"Fiction","genre":"Short Stories","read":"N","shelf":"Shelf 7","layer":"3"},{"title":"And How Are You, Dr. Sacks?","author":"Lawrence Weschler","type":"Non Fiction","genre":"Memoir","read":"Y","shelf":"Shelf 4","layer":"3"},{"title":"The Daily Stoic","author":"Ryan Holiday","type":"Non Fiction","genre":"Philosophy","read":"N","shelf":"Shelf 8","layer":"1"},{"title":"The Shadow of the Gods","author":"John Gwynne","type":"Fiction","genre":"Fantasy","read":"N","shelf":"Shelf 8","layer":"1"},{"title":"The Core","author":"Peter V. Brett","type":"Fiction","genre":"Fantasy","read":"N","shelf":"Shelf 8","layer":"1"},{"title":"To Kill a Mockingbird","author":"Harper Lee","type":"Fiction","genre":"Classics","read":"Y","shelf":"Shelf 9","layer":"2"},{"title":"Ithaca","author":"Alie Benge","type":"Non Fiction","genre":"Essays","read":"Y","shelf":"Shelf 9","layer":"2"},{"title":"Wild Dark Shore","author":"Charlotte McConaghy","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 12","layer":"3"},{"title":"The Poppy War","author":"R.F. Kuang","type":"Fiction","genre":"Fantasy","read":"N","shelf":"Shelf 12","layer":"2"},{"title":"The Iliad and the Odyssey of Homer","author":"Alfred J. Church","type":"Fiction","genre":"Greek Myth","read":"Y","shelf":"Shelf 12","layer":"1"},{"title":"Harlequin","author":"Bernard Cornwell","type":"Fiction","genre":"Historical Fiction","read":"N","shelf":"Shelf 9","layer":"2"},{"title":"The Yellow Wallpaper and Other Stories","author":"Charlotte Perkins Gilman","type":"Fiction","genre":"Classics","read":"Y","shelf":"Shelf 7","layer":"3"},{"title":"Discipline Is Destiny","author":"Ryan Holiday","type":"Non Fiction","genre":"Philosophy","read":"Y","shelf":"Shelf 12","layer":"2"},{"title":"The Poetry Pharmacy","author":"William Sieghart","type":"Poetry","genre":"Poetry","read":"Y","shelf":"Shelf 3","layer":"2"},{"title":"Of Dice and Men","author":"David M. Ewalt","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 8","layer":"2"},{"title":"The Guernsey Literary and Potato Peel Pie Society","author":"Mary Ann Shaffer","type":"Fiction","genre":"Historical Fiction","read":"Y","shelf":"Shelf 7","layer":"3"},{"title":"Ardennes 1944: Hitler's Last Gamble","author":"Antony Beevor","type":"Non Fiction","genre":"History - WW2","read":"N","shelf":"Shelf 6","layer":"3"},{"title":"Maurice","author":"E.M. Forster","type":"Fiction","genre":"Classics","read":"Y","shelf":"Shelf 12","layer":"2"},{"title":"The Front","author":"Patricia Cornwell","type":"Fiction","genre":"Thriller","read":"N","shelf":"Shelf 8","layer":"1"},{"title":"Magician","author":"Raymond E. Feist","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 4","layer":"2"},{"title":"The Deal of a Lifetime","author":"Fredrik Backman","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 3","layer":"1"},{"title":"The Penguin Book of First World War Poetry","author":"George Walter","type":"Poetry","genre":"Poetry","read":"Y","shelf":"Shelf 9","layer":"2"},{"title":"A Place for Everything","author":"Judith Flanders","type":"Non Fiction","genre":"History - Global","read":"Y","shelf":"Shelf 8","layer":"3"},{"title":"The Night Circus","author":"Erin Morgenstern","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 3","layer":"1"},{"title":"The House of Doors","author":"Tan Twan Eng","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 8","layer":"1"},{"title":"Old God's Time","author":"Sebastian Barry","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 8","layer":"1"},{"title":"Pearl","author":"Sian Hughes","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 8","layer":"1"},{"title":"Study for Obedience","author":"Sarah Bernstein","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 12","layer":"2"},{"title":"In Ascension","author":"Martin MacInnes","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 8","layer":"1"},{"title":"How to Build a Boat","author":"Elaine Feeney","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 8","layer":"1"},{"title":"The Grapes of Wrath","author":"John Steinbeck","type":"Fiction","genre":"Classics","read":"Y","shelf":"Shelf 12","layer":"2"},{"title":"Charles Dickens Christmas Books","author":"Charles Dickens","type":"Fiction","genre":"Short Stories","read":"Y","shelf":"Shelf 9","layer":"2"},{"title":"Surfeit of Lampreys","author":"Ngaio Marsh","type":"Fiction","genre":"Mystery","read":"Y","shelf":"Shelf 3","layer":"3"},{"title":"Lincoln in the Bardo","author":"George Saunders","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 12","layer":"2"},{"title":"Train Dreams","author":"Denis Johnson","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 3","layer":"1"},{"title":"Died in the Wool","author":"Ngaio Marsh","type":"Fiction","genre":"Mystery","read":"Y","shelf":"Shelf 3","layer":"3"},{"title":"The Chronicles of Malus Darkblade Vol. 1","author":"Dan Abnett","type":"Fiction","genre":"Warhammer","read":"N","shelf":"Shelf 12","layer":"2"},{"title":"Leaders Eat Last","author":"Simon Sinek","type":"Non Fiction","genre":"Business","read":"N","shelf":"Shelf 12","layer":"1"},{"title":"The Savage Storm: The Brutal Battle for Italy 1943","author":"James Holland","type":"Non Fiction","genre":"History - WW2","read":"N","shelf":"Shelf 6","layer":"3"},{"title":"And Finally: A Neurosurgeon's Reflections on Life","author":"Henry Marsh","type":"Non Fiction","genre":"Memoir","read":"Y","shelf":"Shelf 9","layer":"2"},{"title":"The Hidden Life of Trees","author":"Peter Wohlleben","type":"Non Fiction","genre":"Nature","read":"Y","shelf":"Shelf 12","layer":"1"},{"title":"Bookshops and Bonedust","author":"Travis Baldree","type":"Fiction","genre":"Cozy Fantasy","read":"Y","shelf":"Shelf 12","layer":"1"},{"title":"Brigands and Breadknives","author":"Travis Baldree","type":"Fiction","genre":"Cozy Fantasy","read":"Y","shelf":"Shelf 12","layer":"1"},{"title":"Advance Britannia","author":"Alan Allport","type":"Non Fiction","genre":"History - WW2","read":"N","shelf":"Shelf 6","layer":"3"},{"title":"Alexander Hamilton","author":"Ron Chernow","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 12","layer":"3"},{"title":"This Mortal Coil: A History of Death","author":"Andrew Doig","type":"Non Fiction","genre":"History - Global","read":"Y","shelf":"Shelf 12","layer":"1"},{"title":"Stolen Focus","author":"Johann Hari","type":"Non Fiction","genre":"Psychology","read":"Y","shelf":"Shelf 9","layer":"1"},{"title":"My Grandmother Sends Her Regards and Apologies","author":"Fredrik Backman","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 7","layer":"2"},{"title":"A Life Less Punishing","author":"Matt Heath","type":"Non Fiction","genre":"Philosophy","read":"Y","shelf":"Shelf 4","layer":"3"},{"title":"The Ritual Effect","author":"Michael Norton","type":"Non Fiction","genre":"Self Help","read":"Y","shelf":"Shelf 12","layer":"1"},{"title":"Small Things Like These","author":"Claire Keegan","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 9","layer":"2"},{"title":"Reconciling History","author":"Jody Wilson-Raybould","type":"Non Fiction","genre":"History - Canada","read":"N","shelf":"Shelf 5","layer":"3"},{"title":"The Dragon Republic","author":"R.F. Kuang","type":"Fiction","genre":"Fantasy","read":"N","shelf":"Shelf 12","layer":"2"},{"title":"The Burning God","author":"R.F. Kuang","type":"Fiction","genre":"Fantasy","read":"N","shelf":"Shelf 12","layer":"2"},{"title":"Books Do Furnish a Life","author":"Richard Dawkins","type":"Non Fiction","genre":"Science","read":"Y","shelf":"Shelf 12","layer":"3"},{"title":"The Comfort Book","author":"Matt Haig","type":"Non Fiction","genre":"Self Help","read":"Y","shelf":"Shelf 12","layer":"3"},{"title":"Howl's Moving Castle","author":"Diana Wynne Jones","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 8","layer":"2"},{"title":"The Battle of Waterloo","author":"Jeremy Black","type":"Non Fiction","genre":"Napoleonic","read":"N","shelf":"Shelf 9","layer":"3"},{"title":"The Casual Vacancy","author":"J.K. Rowling","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 6","layer":"1"},{"title":"The Expanse 1: Leviathan Wakes","author":"James S.A. Corey","type":"Fiction","genre":"Sci-Fi","read":"Y","shelf":"Shelf 9","layer":"1"},{"title":"The Expanse 2: Caliban's War","author":"James S.A. Corey","type":"Fiction","genre":"Sci-Fi","read":"Y","shelf":"Shelf 9","layer":"1"},{"title":"The Expanse 3: Abaddon's Gate","author":"James S.A. Corey","type":"Fiction","genre":"Sci-Fi","read":"Y","shelf":"Shelf 9","layer":"1"},{"title":"The Expanse 4: Cibola Burn","author":"James S.A. Corey","type":"Fiction","genre":"Sci-Fi","read":"Y","shelf":"Shelf 9","layer":"1"},{"title":"The Expanse 5: Nemesis Games","author":"James S.A. Corey","type":"Fiction","genre":"Sci-Fi","read":"Y","shelf":"Shelf 9","layer":"1"},{"title":"The Expanse 6: Babylon's Ashes","author":"James S.A. Corey","type":"Fiction","genre":"Sci-Fi","read":"Y","shelf":"Shelf 9","layer":"1"},{"title":"The Expanse 7: Persepolis Rising","author":"James S.A. Corey","type":"Fiction","genre":"Sci-Fi","read":"Y","shelf":"Shelf 9","layer":"1"},{"title":"The Expanse 8: Tiamat's Wrath","author":"James S.A. Corey","type":"Fiction","genre":"Sci-Fi","read":"Y","shelf":"Shelf 9","layer":"1"},{"title":"The Expanse 9: Leviathan Falls","author":"James S.A. Corey","type":"Fiction","genre":"Sci-Fi","read":"Y","shelf":"Shelf 9","layer":"1"},{"title":"Agincourt: The King, the Campaign, the Battle","author":"Juliet Barker","type":"Non Fiction","genre":"History - English","read":"N","shelf":"Shelf 9","layer":"2"},{"title":"Girl, Woman, Other","author":"Bernardine Evaristo","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 9","layer":"2"},{"title":"Four Days in June: Waterloo","author":"Iain Gale","type":"Non Fiction","genre":"Napoleonic","read":"N","shelf":"Shelf 9","layer":"1"},{"title":"In the Closet of the Vatican","author":"Frédéric Martel","type":"Non Fiction","genre":"History - Global","read":"N","shelf":"Shelf 12","layer":"3"},{"title":"The Woman from Saint-Germain","author":"J.R. Lonie","type":"Fiction","genre":"Historical Fiction","read":"N","shelf":"Shelf 12","layer":"3"},{"title":"A Short History of the American Civil War","author":"DK","type":"Non Fiction","genre":"History - USA","read":"N","shelf":"Shelf 9","layer":"3"},{"title":"Prophet Song","author":"Paul Lynch","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 12","layer":"1"},{"title":"The Kamogawa Food Detectives","author":"Hisashi Kashiwai","type":"Fiction","genre":"Japanese Fiction","read":"Y","shelf":"Shelf 12","layer":"1"},{"title":"A Village in the Third Reich","author":"Julia Boyd","type":"Non Fiction","genre":"History - WW2","read":"N","shelf":"Shelf 6","layer":"3"},{"title":"The Mongol Storm","author":"Nicholas Morton","type":"Non Fiction","genre":"History - Asia","read":"N","shelf":"Shelf 12","layer":"3"},{"title":"Normandy '44","author":"James Holland","type":"Non Fiction","genre":"History - WW2","read":"N","shelf":"Shelf 6","layer":"3"},{"title":"War and Peace","author":"Leo Tolstoy","type":"Fiction","genre":"Classics","read":"Y","shelf":"Shelf 9","layer":"3"},{"title":"The Sentence","author":"Louise Erdrich","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 8","layer":"3"},{"title":"The Hare with Amber Eyes","author":"Edmund de Waal","type":"Non Fiction","genre":"Memoir","read":"Y","shelf":"Shelf 9","layer":"2"},{"title":"Why Nations Fail","author":"Daron Acemoglu","type":"Non Fiction","genre":"Business","read":"N","shelf":"Shelf 8","layer":"2"},{"title":"Hannibal: The Life and Legend","author":"Eve Macdonald","type":"Non Fiction","genre":"History - Rome","read":"N","shelf":"Shelf 12","layer":"1"},{"title":"Robert E. Lee: A Biography","author":"Emory M. Thomas","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 9","layer":"3"},{"title":"Redcoat","author":"Richard Holmes","type":"Non Fiction","genre":"History - English","read":"N","shelf":"Shelf 9","layer":"3"},{"title":"SAS Brothers in Arms","author":"Damien Lewis","type":"Non Fiction","genre":"History - WW2","read":"N","shelf":"Shelf 6","layer":"3"},{"title":"Napoleon: The Man Behind the Myth","author":"Adam Zamoyski","type":"Non Fiction","genre":"Napoleonic","read":"N","shelf":"Shelf 9","layer":"2"},{"title":"Entangled Life","author":"Merlin Sheldrake","type":"Non Fiction","genre":"Nature","read":"Y","shelf":"Shelf 12","layer":"1"},{"title":"The Frugal Wizard's Handbook for Surviving Medieval England","author":"Brandon Sanderson","type":"Fiction","genre":"Fantasy","read":"Y","shelf":"Shelf 6","layer":"1"},{"title":"BBQ Economics","author":"Liam Dann","type":"Non Fiction","genre":"Business","read":"N","shelf":"Shelf 6","layer":"1"},{"title":"Jerusalem: The Biography","author":"Simon Sebag Montefiore","type":"Non Fiction","genre":"History - Middle East","read":"Y","shelf":"Shelf 5","layer":"2"},{"title":"The Companion Piece","author":"Ali Smith","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 6","layer":"1"},{"title":"The One Hundred Years of Lenni and Margot","author":"Marianne Cronin","type":"Fiction","genre":"Literary Fiction","read":"Y","shelf":"Shelf 4","layer":"2"},{"title":"Waterloo: Napoleon's Last Gamble","author":"Andrew Roberts","type":"Non Fiction","genre":"Napoleonic","read":"N","shelf":"Shelf 9","layer":"3"},{"title":"Liberation Day","author":"George Saunders","type":"Fiction","genre":"Short Stories","read":"Y","shelf":"Shelf 5","layer":"1"},{"title":"Traffic: Genius, Rivalry and Delusion","author":"Ben Smith","type":"Non Fiction","genre":"Business","read":"N","shelf":"Shelf 6","layer":"3"},{"title":"Gould's Book of Fish","author":"Richard Flanagan","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 4","layer":"3"},{"title":"Time Shelter","author":"Georgi Gospodinov","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 4","layer":"3"},{"title":"Planting the World","author":"Jordan Goodman","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 6","layer":"2"},{"title":"Around the World in 80 Books","author":"David Damrosch","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 6","layer":"3"},{"title":"The Invisible Life of Addie LaRue","author":"V.E. Schwab","type":"Fiction","genre":"Urban Fantasy","read":"Y","shelf":"Shelf 6","layer":"2"},{"title":"Ink Blood Sister Scribe","author":"Emma Törzs","type":"Fiction","genre":"Urban Fantasy","read":"Y","shelf":"Shelf 5","layer":"1"},{"title":"Emily Wilde's Map of the Otherlands","author":"Heather Fawcett","type":"Fiction","genre":"Urban Fantasy","read":"Y","shelf":"Shelf 6","layer":"1"},{"title":"In Search of Perfumes","author":"Dominique Roques","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 6","layer":"1"},{"title":"Girls That Invest","author":"Simran Kaur","type":"Non Fiction","genre":"Business","read":"N","shelf":"Shelf 6","layer":"1"},{"title":"Feel Good Productivity","author":"Ali Abdaal","type":"Non Fiction","genre":"Productivity","read":"N","shelf":"Shelf 6","layer":"1"},{"title":"Sontag: Her Life","author":"Benjamin Moser","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 4","layer":"2"},{"title":"The Living Sea of Waking Dreams","author":"Richard Flanagan","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 4","layer":"2"},{"title":"The Omnivore's Dilemma","author":"Michael Pollan","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 6","layer":"2"},{"title":"Her Majesty's Royal Coven","author":"Juno Dawson","type":"Fiction","genre":"Fantasy","read":"N","shelf":"Shelf 9","layer":"1"},{"title":"Echo of Worlds","author":"M.R. Carey","type":"Fiction","genre":"Sci-Fi","read":"Y","shelf":"Shelf 10","layer":"2"},{"title":"The Phoenix: St Paul's Cathedral","author":"Leo Hollis","type":"Non Fiction","genre":"History - English","read":"N","shelf":"Shelf 4","layer":"2"},{"title":"Demon Copperhead","author":"Barbara Kingsolver","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 6","layer":"2"},{"title":"Book of Longing","author":"Leonard Cohen","type":"Poetry","genre":"Poetry","read":"N","shelf":"Shelf 6","layer":"2"},{"title":"Plight of the Living Dead","author":"Matt Simon","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 6","layer":"2"},{"title":"A Passage to India","author":"E.M. Forster","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 6","layer":"2"},{"title":"The Wealth of Nations","author":"Adam Smith","type":"Non Fiction","genre":"Business","read":"N","shelf":"Shelf 6","layer":"3"},{"title":"Dubliners","author":"James Joyce","type":"Fiction","genre":"Short Stories","read":"N","shelf":"Shelf 2","layer":"2"},{"title":"Churchill","author":"Roy Jenkins","type":"Non Fiction","genre":"Biography","read":"N","shelf":"Shelf 5","layer":"2"},{"title":"The Quiet American","author":"Graham Greene","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 5","layer":"2"},{"title":"Steppenwolf","author":"Hermann Hesse","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 5","layer":"2"},{"title":"Orbital","author":"Samantha Harvey","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 5","layer":"2"},{"title":"Birnam Wood","author":"Eleanor Catton","type":"Fiction","genre":"Literary Fiction","read":"N","shelf":"Shelf 5","layer":"3"},{"title":"In Search of Lost Time: Swann's Way","author":"Marcel Proust","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 3","layer":"1"},{"title":"In Search of Lost Time: In the Shadow of Young Girls in Flower","author":"Marcel Proust","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 3","layer":"1"},{"title":"In Search of Lost Time: The Guermantes Way","author":"Marcel Proust","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 3","layer":"1"},{"title":"In Search of Lost Time: Sodom and Gomorrah","author":"Marcel Proust","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 3","layer":"1"},{"title":"In Search of Lost Time: The Prisoner and the Fugitive","author":"Marcel Proust","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 3","layer":"1"},{"title":"In Search of Lost Time: Finding Time Again","author":"Marcel Proust","type":"Fiction","genre":"Classics","read":"N","shelf":"Shelf 3","layer":"1"},{"title":"Mortals: How the Fear of Death Shaped Human Society","author":"Rachel Menzie Ross","type":"Non Fiction","genre":"History - Global","read":"N","shelf":"Shelf 12","layer":"3"},{"title":"Elixir: A Story of Perfume and Science","author":"Theresa Levitt","type":"Non Fiction","genre":"Science","read":"N","shelf":"Shelf 6","layer":"1"},{"title":"A History of Histories","author":"John Burrow","type":"Non Fiction","genre":"History - Global","read":"N","shelf":"Shelf 3","layer":"2"},{"title":"Hive 2","author":"Dan Abnett","type":"Fiction","genre":"Warhammer","read":"N","shelf":"Shelf 3","layer":"3"},{"title":"Darkoath: A Gunnar Brand Novel","author":"Chris Thursten","type":"Fiction","genre":"Warhammer","read":"N","shelf":"Shelf 4","layer":"3"},{"title":"Empire of the Dawn","author":"Jay Kristoff","type":"Fiction","genre":"Fantasy - Vampire","read":"Regan - In progress","shelf":"Shelf 1","layer":"3"},{"title":"The Dictionary of Obscure Sorrows","author":"John Koenig","type":"Non Fiction","genre":"Reference","read":"In progress","shelf":"Shelf 1","layer":"3"},{"title":"Texas Ranger","author":"James Patterson","type":"Fiction","genre":"Thriller","read":"N","shelf":"Shelf 3","layer":"2"},{"title":"Shadow of the Dragon","author":"Tom Clancy","type":"Fiction","genre":"Thriller","read":"N","shelf":"Shelf 3","layer":"2"},{"title":"If I Survive You","author":"Jonathan Escoffery","type":"Fiction","genre":"Literary Fiction","read":"In progress","shelf":"Shelf 6","layer":"2"},{"title":"The Wren in the Holly Library","author":"K.A. Linde","type":"Fiction","genre":"Fantasy","read":"N","shelf":"Shelf 4","layer":"1"},{"title":"Kingdom Come","author":"Mark Waid and Alex Ross","type":"Comics","genre":"Graphic Novel","read":"N","shelf":"Shelf 11","layer":"2"}];
+// Scroll-triggered fade-in — delay slightly so browser paints the initial hidden state first
+window.addEventListener('DOMContentLoaded', () => {
+  requestAnimationFrame(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
 
-const state = {
-  searchQuery:'', activeGenres:new Set(), unreadOnly:false,
-  activeShelf:null, activeLayer:1, activeBook:null, readOverrides:{}
-};
+    document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
 
-function normaliseGenre(g, type){
-  if(!g || g==='nan') return (type && type.toLowerCase().includes('non')) ? 'Non-Fiction Other' : 'Literary Fiction';
-  const l = g.toLowerCase();
-  if(l.includes('litrpg')) return 'Fantasy';
-  if(l.includes('cozy fantasy')||l.includes('urban fantasy')||l.includes('vampire')||l.includes('fantasy')) return 'Fantasy';
-  if(l.includes('sci-fi')||l.includes('scifi')||l.includes('dystop')) return 'Sci-Fi';
-  if(l.includes('literary fiction')||l.includes('literary')) return 'Literary Fiction';
-  if(l==='fiction') return 'Literary Fiction';
-  if(l.includes('historical fiction')) return 'Historical Fiction';
-  if(l.includes('ww2')||l.includes('world war')) return 'History';
-  if(l.includes('history')||l.includes('napoleonic')||l.includes('war poet')||l.includes('naval')) return 'History';
-  if(l.includes('memoir')||l.includes('autobiography')||l.includes('biograph')) return 'Biography & Memoir';
-  if(l.includes('classic')||l.includes('gothic')||l.includes('adventure')) return 'Classics';
-  if(l.includes('mystery')||l.includes('thriller')||l.includes('horror')) return 'Mystery & Thriller';
-  if(l.includes('psychology')||l.includes('self help')||l.includes('productivity')) return 'Psychology & Self Help';
-  if(l.includes('science')||l.includes('neuroscience')||l.includes('nature')) return 'Science & Nature';
-  if(l.includes('short stor')) return 'Short Stories';
-  if(l.includes('poetr')||l.includes('essay')||l.includes('anthology')||l.includes('letters')) return 'Poetry & Essays';
-  if(l.includes('graphic')||l.includes('gaming')||l.includes('warhammer')||l.includes('comic')||l.includes('game')) return 'Graphic & Gaming';
-  if(l.includes('japanese')) return 'Japanese Fiction';
-  if(l.includes('myth')) return 'Myth & Legend';
-  return 'Non-Fiction Other';
-}
+    // Staggered card reveals
+    const cardObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const card = entry.target;
+          const siblings = Array.from(card.parentElement.children).filter(c => c.classList.contains('fade-in-card'));
+          const index = siblings.indexOf(card);
+          setTimeout(() => card.classList.add('visible'), index * 150);
+          cardObserver.unobserve(card);
+        }
+      });
+    }, { threshold: 0.1 });
 
-const SPINE_COLORS = ['#2d4a3e','#8b2635','#1a3a5c','#4a3000','#3d1f4a','#1f3d2d','#5c3317','#1a4a3a','#6b1a2a','#2a3a5c','#3d4a1f','#5c2a1f','#1f4a4a','#4a1f3d','#2a4a2a'];
-function djb2(str){let h=5381;for(let i=0;i<str.length;i++)h=((h<<5)+h)+str.charCodeAt(i);return h;}
-function genreColor(g){return SPINE_COLORS[Math.abs(djb2(g))%SPINE_COLORS.length];}
-function lightenColor(hex,pct){
-  const n=parseInt(hex.slice(1),16);
-  const r=Math.max(0,Math.min(255,((n>>16)&255)+Math.round(pct*2.55)));
-  const g=Math.max(0,Math.min(255,((n>>8)&255)+Math.round(pct*2.55)));
-  const b=Math.max(0,Math.min(255,(n&255)+Math.round(pct*2.55)));
-  return `rgb(${r},${g},${b})`;
-}
-function spineHeightRange(layer){if(layer==='3')return[72,96];if(layer==='2')return[56,74];return[42,58];}
-function spineOpacity(layer){if(layer==='3')return 1;if(layer==='2')return 0.82;return 0.6;}
-function spineWidth(title){const l=title.length;if(l<12)return 17;if(l<20)return 14;if(l<35)return 12;return 10;}
-
-const BADGE_COLORS={'Fantasy':'#2d4a3e','Sci-Fi':'#1a3a5c','Literary Fiction':'#4a3000','History':'#5c3317','Biography & Memoir':'#3d1f4a','Classics':'#1f3d2d','Historical Fiction':'#6b1a2a','Mystery & Thriller':'#8b2635','Psychology & Self Help':'#1f4a4a','Science & Nature':'#2a4a2a','Short Stories':'#5c2a1f','Poetry & Essays':'#4a1f3d','Graphic & Gaming':'#3d4a1f','Japanese Fiction':'#6b3d17','Myth & Legend':'#7a3d00','Non-Fiction Other':'#4a4a4a'};
-function badgeStyle(ng){return `style="background:${BADGE_COLORS[ng]||'#4a4a4a'};color:rgba(255,255,255,0.92)"`;}
-
-function readStatus(book){
-  const r=(state.readOverrides[book.title] ?? book.read ?? 'N').toLowerCase();
-  if(r==='y'||r==='yes') return 'Y';
-  if(r.includes('progress')) return 'P';
-  return 'N';
-}
-function readIcon(book){
-  const s=readStatus(book);
-  if(s==='Y') return '<span class="read-badge read-y" title="Read">✓</span>';
-  if(s==='P') return '<span class="read-badge read-p" title="In progress">◑</span>';
-  return '<span class="read-badge read-n" title="Unread">○</span>';
-}
-
-function allGenres(){
-  const s=new Set();
-  BOOKS.forEach(b=>s.add(normaliseGenre(b.genre,b.type)));
-  return ['All',...Array.from(s).sort()];
-}
-function filteredBooks(){
-  return BOOKS.filter(b=>{
-    if(state.unreadOnly && readStatus(b)!=='N') return false;
-    if(state.activeGenres.size>0 && !state.activeGenres.has(normaliseGenre(b.genre,b.type))) return false;
-    return true;
+    document.querySelectorAll('.fade-in-card').forEach(el => cardObserver.observe(el));
   });
-}
-function bookMatchesSearch(b,q){
-  if(!q) return true;
-  const s=q.toLowerCase();
-  return b.title.toLowerCase().includes(s)||b.author.toLowerCase().includes(s);
-}
+});
 
-function updateStats(){
-  const base=filteredBooks();
-  const display=state.searchQuery?base.filter(b=>bookMatchesSearch(b,state.searchQuery)):base;
-  const read=display.filter(b=>readStatus(b)==='Y').length;
-  const prog=display.filter(b=>readStatus(b)==='P').length;
-  const unread=display.filter(b=>readStatus(b)==='N').length;
-  const fic=display.filter(b=>!b.type.toLowerCase().includes('non')).length;
-  const nf=display.length-fic;
-  document.getElementById('statsBar').innerHTML=
-    `<span>Showing <strong>${display.length}</strong></span><span>Read <strong>${read}</strong></span><span>In progress <strong>${prog}</strong></span><span>Unread <strong>${unread}</strong></span><span>Fiction <strong>${fic}</strong></span><span>Non-Fiction <strong>${nf}</strong></span>`;
-}
+// Particle field — wait for layout
+window.addEventListener('load', function() {
+  const canvas = document.getElementById('particle-canvas');
+  if (!canvas) return;
+  const section = canvas.parentElement;
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  const PARTICLE_COUNT = 90;
 
-function escapeAttr(s){return s.replace(/"/g,'&quot;');}
+  function resize() {
+    canvas.width = section.offsetWidth;
+    canvas.height = section.offsetHeight;
+  }
 
-function renderGrid(){
-  const grid=document.getElementById('shelfGrid');
-  grid.innerHTML='';
-  for(let i=1;i<=12;i++){
-    const shelfName=`Shelf ${i}`;
-    const shelfBooks=BOOKS.filter(b=>b.shelf===shelfName);
-    const cube=document.createElement('div');
-    cube.className='cube';
-    cube.dataset.shelf=i;
-    cube.style.animationDelay=`${(i-1)*50}ms`;
-    cube.setAttribute('role','button');
-    cube.setAttribute('tabindex','0');
-    cube.setAttribute('aria-label',`Shelf ${i}, ${shelfBooks.length} books`);
+  function init() {
+    resize();
+    particles = [];
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: Math.random() * 2.5 + 0.8,
+        alpha: Math.random() * 0.5 + 0.15,
+      });
+    }
+  }
 
-    const numLabel=document.createElement('div');
-    numLabel.className='cube-number';
-    numLabel.textContent=`Shelf ${i} · ${shelfBooks.length}`;
-    cube.appendChild(numLabel);
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(function(p) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = canvas.width;
+      if (p.x > canvas.width) p.x = 0;
+      if (p.y < 0) p.y = canvas.height;
+      if (p.y > canvas.height) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(139, 92, 246, ' + p.alpha + ')';
+      ctx.fill();
+    });
 
-    const sc=document.createElement('div');
-    sc.className='spines-container';
-    const sorted=[...shelfBooks].sort((a,b)=>(+a.layer)-(+b.layer));
-    const MAX=28;
-    const shown=sorted.slice(0,MAX);
-    const extra=sorted.length-shown.length;
-
-    shown.forEach(book=>{
-      const ng=normaliseGenre(book.genre,book.type);
-      const color=genreColor(ng);
-      const [hMin,hMax]=spineHeightRange(book.layer);
-      const h=hMin+Math.abs(djb2(book.title))%(hMax-hMin);
-      const w=spineWidth(book.title);
-      const spine=document.createElement('div');
-      spine.className='spine';
-      spine.style.width=w+'px';
-      spine.style.height=h+'px';
-      spine.style.background=`linear-gradient(to right,${lightenColor(color,10)},${color},${lightenColor(color,-12)})`;
-      spine.style.opacity=spineOpacity(book.layer);
-      spine.dataset.title=book.title;
-      if(w>=12){
-        const txt=document.createElement('div');
-        txt.className='spine-text';
-        txt.textContent=book.title;
-        spine.appendChild(txt);
+    // Draw faint connections
+    for (var i = 0; i < particles.length; i++) {
+      for (var j = i + 1; j < particles.length; j++) {
+        var dx = particles[i].x - particles[j].x;
+        var dy = particles[i].y - particles[j].y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 150) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(139, 92, 246, ' + (0.15 * (1 - dist / 150)) + ')';
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
       }
-      spine.addEventListener('mouseenter',e=>showTooltip(e,book));
-      spine.addEventListener('mouseleave',hideTooltip);
-      spine.addEventListener('click',e=>{e.stopPropagation();openBook(book);});
-      sc.appendChild(spine);
-    });
-    if(extra>0){
-      const badge=document.createElement('div');
-      badge.className='more-badge';
-      badge.textContent=`+${extra}`;
-      sc.appendChild(badge);
     }
-    cube.appendChild(sc);
-    const floor=document.createElement('div');
-    floor.className='cube-floor';
-    cube.appendChild(floor);
-    cube.addEventListener('click',()=>openPanel(i));
-    cube.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openPanel(i);}});
-    grid.appendChild(cube);
+    requestAnimationFrame(draw);
   }
-  applyDimming();
-}
 
-function applyDimming(){
-  const fb=filteredBooks();
-  document.querySelectorAll('.cube').forEach(cube=>{
-    const shelfName=`Shelf ${cube.dataset.shelf}`;
-    const shelfBooks=fb.filter(b=>b.shelf===shelfName);
-    if(state.searchQuery){
-      const matching=shelfBooks.filter(b=>bookMatchesSearch(b,state.searchQuery));
-      cube.classList.toggle('dim',matching.length===0);
-    }else{
-      cube.classList.toggle('dim',shelfBooks.length===0&&(state.activeGenres.size>0||state.unreadOnly));
-    }
-    cube.querySelectorAll('.spine').forEach(spine=>{
-      const book=BOOKS.find(b=>b.title===spine.dataset.title);
-      if(!book) return;
-      const matches=state.searchQuery&&bookMatchesSearch(book,state.searchQuery);
-      spine.classList.toggle('pulse',!!matches);
-    });
-  });
-}
-
-function updateFilterCount(){
-  const el=document.getElementById('filterCount');
-  if(state.activeGenres.size>0){
-    const fb=filteredBooks();
-    const shelves=new Set(fb.map(b=>b.shelf)).size;
-    el.textContent=`${fb.length} books across ${shelves} shelves`;
-  }else{el.textContent='';}
-}
-
-let searchDebounce;
-function handleSearch(q){
-  state.searchQuery=q;
-  document.getElementById('searchClear').classList.toggle('visible',q.length>0);
-  applyDimming();
-  updateStats();
-  const resultsEl=document.getElementById('searchResults');
-  if(!q){resultsEl.classList.remove('visible');resultsEl.innerHTML='';return;}
-  const matches=BOOKS.filter(b=>bookMatchesSearch(b,q)).slice(0,8);
-  if(matches.length===0){
-    resultsEl.innerHTML='<div style="padding:0.5rem;color:var(--ink-light);font-size:0.85rem">No books found</div>';
-    resultsEl.classList.add('visible');return;
-  }
-  resultsEl.innerHTML=matches.map((b,idx)=>{
-    const ng=normaliseGenre(b.genre,b.type);
-    const layerName=b.layer==='1'?'back':b.layer==='2'?'middle':'front';
-    return `<div class="result-card" data-title="${escapeAttr(b.title)}" tabindex="0"><div class="result-title">${b.title}</div><div class="result-meta">${b.author} · ${b.shelf}, ${layerName} row · ${ng}</div></div>`;
-  }).join('');
-  resultsEl.classList.add('visible');
-  resultsEl.querySelectorAll('.result-card').forEach(card=>{
-    card.addEventListener('click',()=>{
-      const book=BOOKS.find(b=>b.title===card.dataset.title);
-      openBook(book);
-    });
-  });
-}
-
-let tooltipTimer;
-function showTooltip(e,book){
-  clearTimeout(tooltipTimer);
-  tooltipTimer=setTimeout(()=>{
-    const tt=document.getElementById('spineTooltip');
-    tt.innerHTML=`<strong>${book.title}</strong>${book.author}`;
-    tt.style.display='block';
-    positionTooltip(e,tt);
-  },300);
-}
-function positionTooltip(e,tt){
-  const x=Math.min(e.clientX+12,window.innerWidth-240);
-  const y=Math.max(e.clientY-60,8);
-  tt.style.left=x+'px';tt.style.top=y+'px';
-}
-function hideTooltip(){clearTimeout(tooltipTimer);document.getElementById('spineTooltip').style.display='none';}
-document.addEventListener('mousemove',e=>{
-  const tt=document.getElementById('spineTooltip');
-  if(tt.style.display==='block') positionTooltip(e,tt);
+  window.addEventListener('resize', resize);
+  init();
+  draw();
 });
-
-function openPanel(shelfNum){
-  state.activeShelf=shelfNum;state.activeLayer=1;
-  const shelfBooks=BOOKS.filter(b=>b.shelf===`Shelf ${shelfNum}`);
-  document.getElementById('panelTitle').textContent=`Shelf ${shelfNum}`;
-  document.getElementById('panelSubtitle').textContent=`${shelfBooks.length} books`;
-  renderPanelTabs(shelfNum);
-  renderPanelBooks(shelfNum,1);
-  document.getElementById('panelOverlay').classList.add('visible');
-  document.getElementById('detailPanel').classList.add('open');
-}
-function closePanel(){
-  document.getElementById('panelOverlay').classList.remove('visible');
-  document.getElementById('detailPanel').classList.remove('open');
-  state.activeShelf=null;
-}
-function renderPanelTabs(shelfNum){
-  const labels=['Back','Middle','Front'];
-  document.getElementById('panelTabs').innerHTML=[1,2,3].map(l=>{
-    const count=BOOKS.filter(b=>b.shelf===`Shelf ${shelfNum}`&&(+b.layer)===l).length;
-    return `<div class="panel-tab ${state.activeLayer===l?'active':''}" data-layer="${l}">${labels[l-1]} (${count})</div>`;
-  }).join('');
-  document.querySelectorAll('#panelTabs .panel-tab').forEach(tab=>{
-    tab.addEventListener('click',()=>selectLayer(+tab.dataset.layer));
-  });
-}
-function selectLayer(l){
-  state.activeLayer=l;
-  renderPanelTabs(state.activeShelf);
-  renderPanelBooks(state.activeShelf,l);
-}
-function renderPanelBooks(shelfNum,layer){
-  const books=BOOKS.filter(b=>b.shelf===`Shelf ${shelfNum}`&&(+b.layer)===layer);
-  const el=document.getElementById('panelBooks');
-  if(books.length===0){
-    el.innerHTML='<div style="color:var(--ink-light);font-size:0.85rem;padding:0.5rem">No books on this layer</div>';
-    return;
-  }
-  el.innerHTML=books.map(b=>{
-    const ng=normaliseGenre(b.genre,b.type);
-    const color=genreColor(ng);
-    return `<div class="book-card" data-title="${escapeAttr(b.title)}"><div class="book-spine-bar" style="background:${color}"></div><div class="book-card-info"><div class="book-card-title">${b.title}</div><div class="book-card-author">${b.author}</div><div class="book-card-meta"><span class="genre-badge" ${badgeStyle(ng)}>${ng}</span>${readIcon(b)}</div></div></div>`;
-  }).join('');
-  el.querySelectorAll('.book-card').forEach(card=>{
-    card.addEventListener('click',()=>openBook(BOOKS.find(b=>b.title===card.dataset.title)));
-  });
-}
-
-function openBook(book){
-  if(!book) return;
-  state.activeBook=book;
-  const ng=normaliseGenre(book.genre,book.type);
-  const color=genreColor(ng);
-  const layerName=book.layer==='1'?'back row':book.layer==='2'?'middle row':'front row';
-  document.getElementById('modalSpine').style.background=`linear-gradient(to right,${lightenColor(color,12)},${color})`;
-  document.getElementById('modalTitle').textContent=book.title;
-  document.getElementById('modalAuthor').textContent=book.author;
-  document.getElementById('modalLocation').textContent=`${book.shelf} · Layer ${book.layer} — ${layerName}`;
-  document.getElementById('modalGenre').innerHTML=`<span class="genre-badge" ${badgeStyle(ng)}>${ng}</span>`;
-  renderReadToggle(book);
-  document.getElementById('bookOverlay').classList.add('visible');
-}
-function renderReadToggle(book){
-  const s=readStatus(book);
-  const el=document.getElementById('modalReadToggle');
-  el.innerHTML=
-    `<button class="read-btn ${s==='Y'?'active-read':''}" data-val="Y">✓ Read</button>`+
-    `<button class="read-btn ${s==='P'?'active-prog':''}" data-val="P">◑ In progress</button>`+
-    `<button class="read-btn ${s==='N'?'active-unread':''}" data-val="N">○ Unread</button>`;
-  el.querySelectorAll('.read-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>setRead(btn.dataset.val));
-  });
-}
-function setRead(val){
-  if(!state.activeBook) return;
-  state.readOverrides[state.activeBook.title]=val;
-  renderReadToggle(state.activeBook);
-  if(state.activeShelf) renderPanelBooks(state.activeShelf,state.activeLayer);
-  updateStats();
-}
-function closeBook(){
-  document.getElementById('bookOverlay').classList.remove('visible');
-  state.activeBook=null;
-}
-
-function renderFilterBar(){
-  const bar=document.getElementById('filterBar');
-  bar.innerHTML=allGenres().map(g=>{
-    const isAll=g==='All';
-    const isActive=isAll?state.activeGenres.size===0:state.activeGenres.has(g);
-    return `<button class="filter-pill ${isActive?'active':''} ${isAll?'all-pill':''}" data-genre="${escapeAttr(g)}">${g}</button>`;
-  }).join('');
-  bar.querySelectorAll('.filter-pill').forEach(pill=>{
-    pill.addEventListener('click',()=>toggleGenre(pill.dataset.genre));
-  });
-}
-function toggleGenre(g){
-  if(g==='All'){state.activeGenres.clear();}
-  else{
-    if(state.activeGenres.has(g)) state.activeGenres.delete(g);
-    else state.activeGenres.add(g);
-  }
-  renderFilterBar();applyDimming();updateStats();updateFilterCount();
-}
-
-document.getElementById('btnSurprise').addEventListener('click',()=>{
-  const unread=BOOKS.filter(b=>readStatus(b)==='N');
-  if(unread.length===0) return;
-  openBook(unread[Math.floor(Math.random()*unread.length)]);
-});
-document.getElementById('btnUnread').addEventListener('click',()=>{
-  state.unreadOnly=!state.unreadOnly;
-  document.getElementById('btnUnread').classList.toggle('active',state.unreadOnly);
-  applyDimming();updateStats();updateFilterCount();
-});
-document.getElementById('searchInput').addEventListener('input',e=>{
-  clearTimeout(searchDebounce);
-  const val=e.target.value.trim();
-  searchDebounce=setTimeout(()=>handleSearch(val),200);
-});
-document.getElementById('searchInput').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    const first=document.querySelector('.result-card');
-    if(first) first.click();
-  }
-});
-document.getElementById('searchClear').addEventListener('click',()=>{
-  document.getElementById('searchInput').value='';
-  handleSearch('');
-  document.getElementById('searchInput').focus();
-});
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){
-    if(document.getElementById('bookOverlay').classList.contains('visible')){closeBook();return;}
-    if(document.getElementById('detailPanel').classList.contains('open')){closePanel();return;}
-    document.getElementById('searchInput').value='';
-    handleSearch('');
-  }
-});
-document.getElementById('panelOverlay').addEventListener('click',closePanel);
-document.getElementById('panelClose').addEventListener('click',closePanel);
-document.getElementById('modalClose').addEventListener('click',closeBook);
-document.getElementById('bookOverlay').addEventListener('click',e=>{
-  if(e.target===document.getElementById('bookOverlay')) closeBook();
-});
-
-document.getElementById('headerSubtitle').textContent=`${BOOKS.length} books across 12 shelves`;
-renderFilterBar();
-renderGrid();
-updateStats();
 </script>
+
 </body>
 </html>
