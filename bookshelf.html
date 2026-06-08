@@ -412,17 +412,32 @@ const descCache = new Map();
 async function fetchDescription(title, author) {
   const key = `${title}|${author}`;
   if (descCache.has(key)) return descCache.get(key);
+  let desc = null;
   try {
-    const q = encodeURIComponent(`intitle:${title} inauthor:${author}`);
-    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=1&fields=items(volumeInfo(description))`);
+    // Google Books — loose query, better hit rate than field specifiers
+    const q = encodeURIComponent(`${title} ${author}`);
+    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=1&fields=items(volumeInfo(description,title))`);
     const data = await res.json();
-    const desc = data.items?.[0]?.volumeInfo?.description || null;
-    descCache.set(key, desc);
-    return desc;
-  } catch {
-    descCache.set(key, null);
-    return null;
+    desc = data.items?.[0]?.volumeInfo?.description || null;
+  } catch {}
+  if (!desc) {
+    try {
+      // Open Library fallback — search for work key then fetch description
+      const q = encodeURIComponent(title);
+      const a = encodeURIComponent(author);
+      const res = await fetch(`https://openlibrary.org/search.json?title=${q}&author=${a}&limit=1&fields=key`);
+      const data = await res.json();
+      const workKey = data.docs?.[0]?.key;
+      if (workKey) {
+        const wRes = await fetch(`https://openlibrary.org${workKey}.json`);
+        const wData = await wRes.json();
+        const raw = wData.description;
+        desc = typeof raw === 'string' ? raw : (raw?.value || null);
+      }
+    } catch {}
   }
+  descCache.set(key, desc);
+  return desc;
 }
 async function fetchCover(title, author) {
   const key = `${title}|${author}`;
