@@ -265,12 +265,13 @@ header{text-align:center;padding:3rem 1rem 2rem;position:relative}
 }
 .book-overlay.visible{display:flex}
 .book-modal{
-  background:var(--cream);border-radius:16px;padding:2rem;max-width:500px;width:100%;
-  display:flex;gap:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,0.4);position:relative;animation:modalIn 0.25s ease;
+  background:var(--cream);border-radius:20px;padding:1.8rem 1.8rem 1.6rem;max-width:420px;width:100%;
+  display:flex;gap:1.2rem;box-shadow:0 24px 72px rgba(0,0,0,0.5);position:relative;animation:modalIn 0.25s ease;
 }
-.book-modal-spine{width:24px;border-radius:4px;flex-shrink:0;min-height:180px}
+.book-modal-spine{width:20px;border-radius:3px;flex-shrink:0;min-height:160px}
 .book-modal-body{flex:1;min-width:0}
-.book-modal-cover{width:100%;max-height:260px;object-fit:cover;border-radius:4px;margin-bottom:14px;display:block;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.book-cover-wrap{width:100%;aspect-ratio:2/3;max-height:300px;background:#1c1410;border-radius:8px;overflow:hidden;margin-bottom:1.2rem;box-shadow:0 8px 28px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center}
+.book-modal-cover{width:100%;height:100%;object-fit:contain;display:block}
 .move-section{margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--cream-dark)}
 .move-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:0.5rem;font-weight:600}
 .move-controls{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center}
@@ -283,8 +284,8 @@ header{text-align:center;padding:3rem 1rem 2rem;position:relative}
   position:absolute;top:1rem;right:1rem;background:none;border:none;
   font-size:1.3rem;color:var(--ink-light);cursor:pointer;
 }
-.book-modal-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:0.4rem}
-.book-modal-author{font-size:0.9rem;color:var(--ink-light);margin-bottom:1rem}
+.book-modal-title{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:0.3rem}
+.book-modal-author{font-size:0.88rem;color:var(--ink-light);margin-bottom:0.8rem;font-style:italic}
 .book-modal-location{font-size:0.82rem;color:var(--amber);font-weight:500;margin-bottom:0.8rem}
 .book-modal-genre{margin-bottom:1rem}
 .read-toggle{display:flex;gap:0.5rem;flex-wrap:wrap}
@@ -366,7 +367,7 @@ header{text-align:center;padding:3rem 1rem 2rem;position:relative}
     <div class="book-modal-spine" id="modalSpine"></div>
     <div class="book-modal-body">
       <button class="book-modal-close" id="modalClose" aria-label="Close">×</button>
-      <img class="book-modal-cover" id="modalCover" alt="" style="display:none">
+      <div class="book-cover-wrap" id="modalCoverWrap" style="display:none"><img class="book-modal-cover" id="modalCover" alt=""></div>
       <div class="book-modal-title" id="modalTitle"></div>
       <div class="book-modal-author" id="modalAuthor"></div>
       <div class="book-modal-location" id="modalLocation"></div>
@@ -729,13 +730,14 @@ function openBook(book){
   document.getElementById('modalGenre').innerHTML=`<span class="genre-badge" ${badgeStyle(ng)}>${ng}</span>`;
   renderReadToggle(book);
   renderMoveControls(book);
+  const coverWrap = document.getElementById('modalCoverWrap');
   const coverEl = document.getElementById('modalCover');
-  coverEl.style.display = 'none';
+  coverWrap.style.display = 'none';
   fetchCover(book.title, book.author).then(url => {
     if (url && state.activeBook === book) {
       coverEl.src = url;
-      coverEl.style.display = 'block';
-      coverEl.onerror = () => { coverEl.style.display = 'none'; };
+      coverEl.onerror = () => { coverWrap.style.display = 'none'; };
+      coverWrap.style.display = 'flex';
     }
   });
   document.getElementById('bookOverlay').classList.add('visible');
