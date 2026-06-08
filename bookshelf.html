@@ -271,6 +271,14 @@ header{text-align:center;padding:3rem 1rem 2rem;position:relative}
 .book-modal-spine{width:24px;border-radius:4px;flex-shrink:0;min-height:180px}
 .book-modal-body{flex:1;min-width:0}
 .book-modal-cover{width:100%;max-height:260px;object-fit:cover;border-radius:4px;margin-bottom:14px;display:block;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.move-section{margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--cream-dark)}
+.move-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:0.5rem;font-weight:600}
+.move-controls{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center}
+.move-select{padding:0.4rem 0.6rem;border-radius:6px;border:1.5px solid var(--cream-dark);background:var(--cream);color:var(--ink);font-size:0.82rem;cursor:pointer;flex:1;min-width:120px}
+.move-select:focus{outline:2px solid var(--amber);border-color:var(--amber)}
+.move-btn{padding:0.4rem 1rem;border-radius:6px;border:none;background:var(--wood-dark);color:var(--cream);font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.move-btn:hover{background:var(--amber);color:var(--ink)}
+#moveLayer:disabled{opacity:0.4;cursor:not-allowed}
 .book-modal-close{
   position:absolute;top:1rem;right:1rem;background:none;border:none;
   font-size:1.3rem;color:var(--ink-light);cursor:pointer;
@@ -364,6 +372,26 @@ header{text-align:center;padding:3rem 1rem 2rem;position:relative}
       <div class="book-modal-location" id="modalLocation"></div>
       <div class="book-modal-genre" id="modalGenre"></div>
       <div class="read-toggle" id="modalReadToggle"></div>
+      <div class="move-section" id="modalMoveSection">
+        <div class="move-label">Move to…</div>
+        <div class="move-controls">
+          <select id="moveShelf" class="move-select">
+            <option value="checked-out">📖 Checked out</option>
+            <option value="Shelf 1">Shelf 1</option><option value="Shelf 2">Shelf 2</option>
+            <option value="Shelf 3">Shelf 3</option><option value="Shelf 4">Shelf 4</option>
+            <option value="Shelf 5">Shelf 5</option><option value="Shelf 6">Shelf 6</option>
+            <option value="Shelf 7">Shelf 7</option><option value="Shelf 8">Shelf 8</option>
+            <option value="Shelf 9">Shelf 9</option><option value="Shelf 10">Shelf 10</option>
+            <option value="Shelf 11">Shelf 11</option><option value="Shelf 12">Shelf 12</option>
+          </select>
+          <select id="moveLayer" class="move-select">
+            <option value="1">Layer 1 — back</option>
+            <option value="2">Layer 2 — middle</option>
+            <option value="3">Layer 3 — front</option>
+          </select>
+          <button class="move-btn" id="moveSaveBtn">Save</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -390,10 +418,23 @@ async function fetchCover(title, author) {
   }
 }
 
+function loadStorage(key, fallback){
+  try { const v=localStorage.getItem(key); return v?JSON.parse(v):fallback; } catch{ return fallback; }
+}
+function saveStorage(key, val){ try{ localStorage.setItem(key,JSON.stringify(val)); }catch{} }
+
 const state = {
   searchQuery:'', activeGenres:new Set(), unreadOnly:false,
-  activeShelf:null, activeLayer:1, activeBook:null, readOverrides:{}
+  activeShelf:null, activeLayer:1, activeBook:null,
+  readOverrides: loadStorage('shelf_readOverrides',{}),
+  locationOverrides: loadStorage('shelf_locationOverrides',{})
 };
+
+function bookLocation(book){
+  const o=state.locationOverrides[book.title];
+  if(o) return o;
+  return {shelf:book.shelf, layer:book.layer, checkedOut:false};
+}
 
 function normaliseGenre(g, type){
   if(!g || g==='nan') return (type && type.toLowerCase().includes('non')) ? 'Non-Fiction Other' : 'Literary Fiction';
@@ -486,7 +527,7 @@ function renderGrid(){
   grid.innerHTML='';
   for(let i=1;i<=12;i++){
     const shelfName=`Shelf ${i}`;
-    const shelfBooks=BOOKS.filter(b=>b.shelf===shelfName);
+    const shelfBooks=BOOKS.filter(b=>{const loc=bookLocation(b);return !loc.checkedOut&&loc.shelf===shelfName;});
     const cube=document.createElement('div');
     cube.className='cube';
     cube.dataset.shelf=i;
@@ -502,7 +543,7 @@ function renderGrid(){
 
     const sc=document.createElement('div');
     sc.className='spines-container';
-    const sorted=[...shelfBooks].sort((a,b)=>(+a.layer)-(+b.layer));
+    const sorted=[...shelfBooks].sort((a,b)=>(+(bookLocation(a).layer))-(+(bookLocation(b).layer)));
     const MAX=28;
     const shown=sorted.slice(0,MAX);
     const extra=sorted.length-shown.length;
@@ -510,7 +551,8 @@ function renderGrid(){
     shown.forEach(book=>{
       const ng=normaliseGenre(book.genre,book.type);
       const color=genreColor(ng);
-      const [hMin,hMax]=spineHeightRange(book.layer);
+      const bLoc=bookLocation(book);
+      const [hMin,hMax]=spineHeightRange(bLoc.layer);
       const h=hMin+Math.abs(djb2(book.title))%(hMax-hMin);
       const w=spineWidth(book.title);
       const spine=document.createElement('div');
@@ -518,7 +560,7 @@ function renderGrid(){
       spine.style.width=w+'px';
       spine.style.height=h+'px';
       spine.style.background=`linear-gradient(to right,${lightenColor(color,10)},${color},${lightenColor(color,-12)})`;
-      spine.style.opacity=spineOpacity(book.layer);
+      spine.style.opacity=spineOpacity(bLoc.layer);
       spine.dataset.title=book.title;
       if(w>=12){
         const txt=document.createElement('div');
@@ -627,9 +669,9 @@ document.addEventListener('mousemove',e=>{
 
 function openPanel(shelfNum){
   state.activeShelf=shelfNum;state.activeLayer=1;
-  const shelfBooks=BOOKS.filter(b=>b.shelf===`Shelf ${shelfNum}`);
+  const shelfBooks=BOOKS.filter(b=>{const l=bookLocation(b);return !l.checkedOut&&l.shelf===`Shelf ${shelfNum}`;});
   document.getElementById('panelTitle').textContent=`Shelf ${shelfNum}`;
-  document.getElementById('panelSubtitle').textContent=`${shelfBooks.length} books`;
+  document.getElementById('panelSubtitle').textContent=`${shelfBooks.length} book${shelfBooks.length===1?'':'s'}`;
   renderPanelTabs(shelfNum);
   renderPanelBooks(shelfNum,1);
   document.getElementById('panelOverlay').classList.add('visible');
@@ -643,7 +685,7 @@ function closePanel(){
 function renderPanelTabs(shelfNum){
   const labels=['Back','Middle','Front'];
   document.getElementById('panelTabs').innerHTML=[1,2,3].map(l=>{
-    const count=BOOKS.filter(b=>b.shelf===`Shelf ${shelfNum}`&&(+b.layer)===l).length;
+    const count=BOOKS.filter(b=>{const lo=bookLocation(b);return !lo.checkedOut&&lo.shelf===`Shelf ${shelfNum}`&&(+lo.layer)===l;}).length;
     return `<div class="panel-tab ${state.activeLayer===l?'active':''}" data-layer="${l}">${labels[l-1]} (${count})</div>`;
   }).join('');
   document.querySelectorAll('#panelTabs .panel-tab').forEach(tab=>{
@@ -656,7 +698,7 @@ function selectLayer(l){
   renderPanelBooks(state.activeShelf,l);
 }
 function renderPanelBooks(shelfNum,layer){
-  const books=BOOKS.filter(b=>b.shelf===`Shelf ${shelfNum}`&&(+b.layer)===layer);
+  const books=BOOKS.filter(b=>{const l=bookLocation(b);return !l.checkedOut&&l.shelf===`Shelf ${shelfNum}`&&(+l.layer)===layer;});
   const el=document.getElementById('panelBooks');
   if(books.length===0){
     el.innerHTML='<div style="color:var(--ink-light);font-size:0.85rem;padding:0.5rem">No books on this layer</div>';
@@ -681,9 +723,12 @@ function openBook(book){
   document.getElementById('modalSpine').style.background=`linear-gradient(to right,${lightenColor(color,12)},${color})`;
   document.getElementById('modalTitle').textContent=book.title;
   document.getElementById('modalAuthor').textContent=book.author;
-  document.getElementById('modalLocation').textContent=`${book.shelf} · Layer ${book.layer} — ${layerName}`;
+  const loc=bookLocation(book);
+  const locText=loc.checkedOut?'Currently checked out (off shelf)':`${loc.shelf} · Layer ${loc.layer} — ${layerName}`;
+  document.getElementById('modalLocation').textContent=locText;
   document.getElementById('modalGenre').innerHTML=`<span class="genre-badge" ${badgeStyle(ng)}>${ng}</span>`;
   renderReadToggle(book);
+  renderMoveControls(book);
   const coverEl = document.getElementById('modalCover');
   coverEl.style.display = 'none';
   fetchCover(book.title, book.author).then(url => {
@@ -709,7 +754,36 @@ function renderReadToggle(book){
 function setRead(val){
   if(!state.activeBook) return;
   state.readOverrides[state.activeBook.title]=val;
+  saveStorage('shelf_readOverrides',state.readOverrides);
   renderReadToggle(state.activeBook);
+  if(state.activeShelf) renderPanelBooks(state.activeShelf,state.activeLayer);
+  updateStats();
+}
+function renderMoveControls(book){
+  const loc=bookLocation(book);
+  const shelfSel=document.getElementById('moveShelf');
+  const layerSel=document.getElementById('moveLayer');
+  shelfSel.value=loc.checkedOut?'checked-out':loc.shelf;
+  layerSel.value=loc.layer||book.layer;
+  layerSel.disabled=loc.checkedOut;
+}
+function setLocation(){
+  if(!state.activeBook) return;
+  const book=state.activeBook;
+  const shelfVal=document.getElementById('moveShelf').value;
+  const layerVal=document.getElementById('moveLayer').value;
+  const checkedOut=shelfVal==='checked-out';
+  state.locationOverrides[book.title]={
+    shelf:checkedOut?book.shelf:shelfVal,
+    layer:checkedOut?book.layer:layerVal,
+    checkedOut
+  };
+  saveStorage('shelf_locationOverrides',state.locationOverrides);
+  const loc=bookLocation(book);
+  const layerName=loc.layer==='1'?'back row':loc.layer==='2'?'middle row':'front row';
+  const locText=loc.checkedOut?'Currently checked out (off shelf)':`${loc.shelf} · Layer ${loc.layer} — ${layerName}`;
+  document.getElementById('modalLocation').textContent=locText;
+  renderGrid();
   if(state.activeShelf) renderPanelBooks(state.activeShelf,state.activeLayer);
   updateStats();
 }
@@ -775,6 +849,10 @@ document.addEventListener('keydown',e=>{
 document.getElementById('panelOverlay').addEventListener('click',closePanel);
 document.getElementById('panelClose').addEventListener('click',closePanel);
 document.getElementById('modalClose').addEventListener('click',closeBook);
+document.getElementById('moveSaveBtn').addEventListener('click',setLocation);
+document.getElementById('moveShelf').addEventListener('change',()=>{
+  document.getElementById('moveLayer').disabled=document.getElementById('moveShelf').value==='checked-out';
+});
 document.getElementById('bookOverlay').addEventListener('click',e=>{
   if(e.target===document.getElementById('bookOverlay')) closeBook();
 });
