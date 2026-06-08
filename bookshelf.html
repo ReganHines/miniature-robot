@@ -260,60 +260,110 @@ header{text-align:center;padding:3rem 1rem 2rem;position:relative}
 .read-p{color:var(--amber)}
 
 .book-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;display:none;
-  align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(3px);
+  position:fixed;inset:0;background:rgba(15,10,5,0.72);z-index:300;display:none;
+  align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);padding:0;
 }
 .book-overlay.visible{display:flex}
+@media(min-width:520px){.book-overlay{align-items:center;padding:1.5rem}}
 .book-modal{
-  background:var(--cream);border-radius:20px;padding:1.8rem 1.8rem 1.6rem;max-width:420px;width:100%;
-  display:flex;gap:1.2rem;box-shadow:0 24px 72px rgba(0,0,0,0.5);position:relative;animation:modalIn 0.25s ease;
+  background:var(--cream);border-radius:24px 24px 0 0;width:100%;max-width:460px;
+  max-height:92vh;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 -8px 48px rgba(0,0,0,0.35),0 32px 80px rgba(0,0,0,0.5);
+  animation:modalIn 0.32s cubic-bezier(0.34,1.1,0.64,1);
 }
-.book-modal-spine{width:20px;border-radius:3px;flex-shrink:0;min-height:160px}
-.book-modal-body{flex:1;min-width:0}
-.book-cover-wrap{width:100%;aspect-ratio:2/3;max-height:300px;background:#1c1410;border-radius:8px;overflow:hidden;margin-bottom:1.2rem;box-shadow:0 8px 28px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center}
-.book-modal-cover{width:100%;height:100%;object-fit:contain;display:block}
-.synopsis-btn{margin-top:1rem;padding:0.45rem 1rem;border-radius:6px;border:1.5px solid var(--cream-dark);background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--ink);cursor:pointer;width:100%;text-align:left}
-.synopsis-btn:hover{background:var(--cream-dark)}
-.synopsis-body{margin-top:0.7rem;font-size:0.84rem;line-height:1.65;color:var(--ink);padding:0.8rem;background:rgba(0,0,0,0.04);border-radius:6px;display:none}
-.synopsis-body.open{display:block}
-.synopsis-loading{opacity:0.5;font-style:italic}
-.move-section{margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--cream-dark)}
-.move-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:0.5rem;font-weight:600}
-.move-controls{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center}
-.move-select{padding:0.4rem 0.6rem;border-radius:6px;border:1.5px solid var(--cream-dark);background:var(--cream);color:var(--ink);font-size:0.82rem;cursor:pointer;flex:1;min-width:120px}
-.move-select:focus{outline:2px solid var(--amber);border-color:var(--amber)}
-.move-btn{padding:0.4rem 1rem;border-radius:6px;border:none;background:var(--wood-dark);color:var(--cream);font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap}
-.move-btn:hover{background:var(--amber);color:var(--ink)}
-#moveLayer:disabled{opacity:0.4;cursor:not-allowed}
+@media(min-width:520px){.book-modal{border-radius:24px;max-height:88vh}}
+.book-modal-hero{
+  width:100%;height:220px;flex-shrink:0;position:relative;overflow:hidden;
+  background:var(--wood-dark);display:flex;align-items:center;justify-content:center;
+}
+.book-modal-hero-bg{
+  position:absolute;inset:0;background-size:cover;background-position:center;
+  filter:blur(20px) brightness(0.5);transform:scale(1.1);
+}
+.book-modal-cover{
+  position:relative;z-index:1;height:188px;width:auto;max-width:88%;
+  object-fit:contain;border-radius:3px;box-shadow:0 8px 32px rgba(0,0,0,0.65);
+  display:none;
+}
+.book-modal-hero-fallback{
+  position:relative;z-index:1;width:76px;height:114px;border-radius:3px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.5);
+}
 .book-modal-close{
-  position:absolute;top:1rem;right:1rem;background:none;border:none;
-  font-size:1.3rem;color:var(--ink-light);cursor:pointer;
+  position:absolute;top:0.7rem;right:0.7rem;z-index:10;
+  width:30px;height:30px;border-radius:50%;border:none;
+  background:rgba(0,0,0,0.45);color:#fff;font-size:1rem;line-height:1;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background 0.15s;backdrop-filter:blur(4px);
 }
-.book-modal-title{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:0.3rem}
-.book-modal-author{font-size:0.88rem;color:var(--ink-light);margin-bottom:0.8rem;font-style:italic}
-.book-modal-location{font-size:0.82rem;color:var(--amber);font-weight:500;margin-bottom:0.8rem}
-.book-modal-genre{margin-bottom:1rem}
-.read-toggle{display:flex;gap:0.5rem;flex-wrap:wrap}
+.book-modal-close:hover{background:rgba(0,0,0,0.7)}
+.book-modal-body{flex:1;overflow-y:auto;padding:1.3rem 1.4rem 2rem;scroll-behavior:smooth}
+.book-modal-body::-webkit-scrollbar{width:3px}
+.book-modal-body::-webkit-scrollbar-thumb{background:var(--cream-dark);border-radius:2px}
+.book-modal-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:0.2rem}
+.book-modal-author{font-size:0.88rem;color:var(--ink-light);margin-bottom:0.9rem;font-style:italic}
+.book-modal-meta{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:1.1rem}
+.book-modal-location{font-size:0.76rem;color:var(--amber);font-weight:600}
+.book-modal-genre{margin:0}
+.read-toggle{display:flex;gap:0.4rem;margin-bottom:1.1rem}
 .read-btn{
-  padding:0.5rem 0.9rem;border-radius:6px;border:1.5px solid var(--cream-dark);
-  background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;
-  cursor:pointer;transition:all 0.15s;color:var(--ink-light);
+  flex:1;padding:0.55rem 0.4rem;border-radius:8px;border:1.5px solid var(--cream-dark);
+  background:transparent;font-family:'DM Sans',sans-serif;font-size:0.79rem;
+  color:var(--ink);cursor:pointer;transition:all 0.15s;text-align:center;
 }
+.read-btn:hover{border-color:var(--amber)}
 .read-btn.active-read{background:#2d7a2d;border-color:#2d7a2d;color:#fff}
 .read-btn.active-prog{background:var(--amber);border-color:var(--amber);color:#fff}
 .read-btn.active-unread{background:var(--ink-light);border-color:var(--ink-light);color:#fff}
+.synopsis-btn{
+  width:100%;padding:0.65rem 1rem;border-radius:10px;margin-bottom:0;
+  border:1.5px solid var(--cream-dark);background:transparent;
+  font-family:'DM Sans',sans-serif;font-size:0.84rem;color:var(--ink);
+  cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+  transition:background 0.15s,border-color 0.15s;
+}
+.synopsis-btn:hover{background:var(--cream-dark)}
+.synopsis-btn.open{border-color:var(--amber);border-bottom-left-radius:0;border-bottom-right-radius:0}
+.synopsis-chevron{transition:transform 0.25s;display:inline-block}
+.synopsis-btn.open .synopsis-chevron{transform:rotate(180deg)}
+.synopsis-body{
+  font-size:0.85rem;line-height:1.7;color:var(--ink);
+  padding:0 1rem;background:rgba(0,0,0,0.03);
+  border:1.5px solid var(--amber);border-top:none;
+  border-radius:0 0 10px 10px;
+  max-height:0;overflow:hidden;
+  transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1),padding 0.25s;
+  margin-bottom:1.1rem;
+}
+.synopsis-body.open{max-height:700px;padding:0.9rem 1rem 1rem}
+.synopsis-loading{opacity:0.5;font-style:italic}
+.move-section{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--cream-dark)}
+.move-label{font-size:0.71rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-light);margin-bottom:0.55rem;font-weight:700}
+.move-controls{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:stretch}
+.move-select{
+  padding:0.5rem 0.6rem;border-radius:8px;border:1.5px solid var(--cream-dark);
+  background:var(--cream);color:var(--ink);font-size:0.81rem;cursor:pointer;
+  flex:1;min-width:110px;font-family:'DM Sans',sans-serif;
+}
+.move-select:focus{outline:2px solid var(--amber);border-color:var(--amber)}
+.move-btn{
+  padding:0.5rem 1.1rem;border-radius:8px;border:none;
+  background:var(--wood-dark);color:var(--cream);font-size:0.81rem;
+  font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s;
+}
+.move-btn:hover{background:var(--amber);color:var(--ink)}
+#moveLayer:disabled{opacity:0.4;cursor:not-allowed}
 
 @keyframes cubeIn{from{opacity:0;transform:scale(0.92) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes spinePulse{0%,100%{filter:brightness(1) drop-shadow(0 0 3px var(--highlight))}50%{filter:brightness(1.4) drop-shadow(0 0 9px var(--highlight))}}
-@keyframes modalIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+@keyframes modalIn{from{opacity:0;transform:translateY(40px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 
 @media(max-width:600px){
   .shelf-frame{padding:12px}
   .shelf-grid{gap:10px;grid-template-columns:repeat(2,1fr)}
   .cube{min-height:110px}
   .spines-container{min-height:72px}
-  .book-modal{flex-direction:column}
-  .book-modal-spine{min-height:0;width:100%;height:16px;border-radius:2px}
+  .book-modal-hero{height:180px}
 }
 @media(max-width:380px){.shelf-grid{grid-template-columns:1fr}}
 </style>
@@ -369,16 +419,24 @@ header{text-align:center;padding:3rem 1rem 2rem;position:relative}
 
 <div class="book-overlay" id="bookOverlay">
   <div class="book-modal" id="bookModal">
-    <div class="book-modal-spine" id="modalSpine"></div>
+    <!-- Hero cover area -->
+    <div class="book-modal-hero" id="modalHero">
+      <div class="book-modal-hero-bg" id="modalHeroBg"></div>
+      <img class="book-modal-cover" id="modalCover" alt="">
+      <div class="book-modal-hero-fallback" id="modalHeroFallback"></div>
+    </div>
+    <!-- Close button floats over hero -->
+    <button class="book-modal-close" id="modalClose" aria-label="Close">×</button>
+    <!-- Scrollable body -->
     <div class="book-modal-body">
-      <button class="book-modal-close" id="modalClose" aria-label="Close">×</button>
-      <div class="book-cover-wrap" id="modalCoverWrap" style="display:none"><img class="book-modal-cover" id="modalCover" alt=""></div>
       <div class="book-modal-title" id="modalTitle"></div>
       <div class="book-modal-author" id="modalAuthor"></div>
-      <div class="book-modal-location" id="modalLocation"></div>
-      <div class="book-modal-genre" id="modalGenre"></div>
+      <div class="book-modal-meta">
+        <span class="book-modal-location" id="modalLocation"></span>
+        <span id="modalGenre"></span>
+      </div>
       <div class="read-toggle" id="modalReadToggle"></div>
-      <button class="synopsis-btn" id="synopsisBtn">▸ Synopsis</button>
+      <button class="synopsis-btn" id="synopsisBtn"><span>Synopsis</span><span class="synopsis-chevron">▾</span></button>
       <div class="synopsis-body" id="synopsisBody"></div>
       <div class="move-section" id="modalMoveSection">
         <div class="move-label">Move to…</div>
@@ -748,31 +806,49 @@ function openBook(book){
   state.activeBook=book;
   const ng=normaliseGenre(book.genre,book.type);
   const color=genreColor(ng);
-  const layerName=book.layer==='1'?'back row':book.layer==='2'?'middle row':'front row';
-  document.getElementById('modalSpine').style.background=`linear-gradient(to right,${lightenColor(color,12)},${color})`;
+  const loc=bookLocation(book);
+  const layerName=loc.layer==='1'?'back row':loc.layer==='2'?'middle row':'front row';
+  const locText=loc.checkedOut?'Currently checked out (off shelf)':`${loc.shelf} · Layer ${loc.layer} — ${layerName}`;
+
+  // Hero — set genre colour as background, hide cover until loaded
+  const heroBg=document.getElementById('modalHeroBg');
+  const coverEl=document.getElementById('modalCover');
+  const fallback=document.getElementById('modalHeroFallback');
+  heroBg.style.backgroundImage='none';
+  heroBg.style.background=color;
+  coverEl.style.display='none';
+  fallback.style.display='flex';
+  fallback.style.background=`linear-gradient(135deg,${lightenColor(color,14)},${color})`;
+
   document.getElementById('modalTitle').textContent=book.title;
   document.getElementById('modalAuthor').textContent=book.author;
-  const loc=bookLocation(book);
-  const locText=loc.checkedOut?'Currently checked out (off shelf)':`${loc.shelf} · Layer ${loc.layer} — ${layerName}`;
   document.getElementById('modalLocation').textContent=locText;
   document.getElementById('modalGenre').innerHTML=`<span class="genre-badge" ${badgeStyle(ng)}>${ng}</span>`;
   renderReadToggle(book);
   renderMoveControls(book);
-  document.getElementById('synopsisBtn').textContent='▸ Synopsis';
-  const sb=document.getElementById('synopsisBody');
-  sb.classList.remove('open');
-  sb.textContent='';
-  const coverWrap = document.getElementById('modalCoverWrap');
-  const coverEl = document.getElementById('modalCover');
-  coverWrap.style.display = 'none';
+
+  // Reset synopsis
+  const synBtn=document.getElementById('synopsisBtn');
+  const synBody=document.getElementById('synopsisBody');
+  synBtn.classList.remove('open');
+  synBody.classList.remove('open');
+  synBody.textContent='';
+
+  document.getElementById('bookOverlay').classList.add('visible');
+
+  // Load cover — use as hero image with blurred bg
   fetchCover(book.title, book.author).then(url => {
     if (url && state.activeBook === book) {
+      coverEl.onload = () => {
+        heroBg.style.background='none';
+        heroBg.style.backgroundImage=`url('${url}')`;
+        fallback.style.display='none';
+        coverEl.style.display='block';
+      };
+      coverEl.onerror = () => {};
       coverEl.src = url;
-      coverEl.onerror = () => { coverWrap.style.display = 'none'; };
-      coverWrap.style.display = 'flex';
     }
   });
-  document.getElementById('bookOverlay').classList.add('visible');
 }
 function renderReadToggle(book){
   const s=readStatus(book);
@@ -889,7 +965,7 @@ document.getElementById('synopsisBtn').addEventListener('click',()=>{
   const book=state.activeBook;
   if(!book) return;
   const isOpen=body.classList.toggle('open');
-  btn.textContent=isOpen?'▾ Synopsis':'▸ Synopsis';
+  btn.classList.toggle('open',isOpen);
   if(isOpen && !body.textContent.trim()){
     body.innerHTML='<span class="synopsis-loading">Loading…</span>';
     fetchDescription(book.title,book.author).then(desc=>{
