@@ -458,6 +458,34 @@ header{text-align:center;padding:3rem 1rem 2rem;position:relative}
   </div>
 </section>
 
+<section class="organise-section" id="kitchenSection">
+  <div class="organise-header" id="kitchenToggle" role="button" tabindex="0">
+    <div class="organise-heading">
+      <h2 class="organise-title">🍳 Under the Kitchen</h2>
+      <p class="organise-sub" id="kitchenSub"></p>
+    </div>
+    <span class="organise-chevron">▾</span>
+  </div>
+  <div class="organise-body" id="kitchenBody">
+    <input class="organise-search" id="kitchenSearch" type="search" placeholder="Filter…" autocomplete="off"/>
+    <div class="organise-grid" id="kitchenGrid"></div>
+  </div>
+</section>
+
+<section class="organise-section" id="boxSection">
+  <div class="organise-header" id="boxToggle" role="button" tabindex="0">
+    <div class="organise-heading">
+      <h2 class="organise-title">📦 In the Box</h2>
+      <p class="organise-sub" id="boxSub"></p>
+    </div>
+    <span class="organise-chevron">▾</span>
+  </div>
+  <div class="organise-body" id="boxBody">
+    <input class="organise-search" id="boxSearch" type="search" placeholder="Filter…" autocomplete="off"/>
+    <div class="organise-grid" id="boxGrid"></div>
+  </div>
+</section>
+
 <div class="spine-tooltip" id="spineTooltip"></div>
 
 <div class="panel-overlay" id="panelOverlay"></div>
@@ -500,6 +528,8 @@ header{text-align:center;padding:3rem 1rem 2rem;position:relative}
           <select id="moveShelf" class="move-select">
             <option value="checked-out">📖 Checked out</option>
             <option value="To Organise">🗂 To Organise</option>
+            <option value="Under the Kitchen">🍳 Under the Kitchen</option>
+            <option value="In the Box">📦 In the Box</option>
             <option value="Shelf 1">Shelf 1</option><option value="Shelf 2">Shelf 2</option>
             <option value="Shelf 3">Shelf 3</option><option value="Shelf 4">Shelf 4</option>
             <option value="Shelf 5">Shelf 5</option><option value="Shelf 6">Shelf 6</option>
@@ -925,9 +955,10 @@ function setRead(val){
   if(state.activeShelf) renderPanelBooks(state.activeShelf,state.activeLayer);
   updateStats();
 }
+const STORAGE_SHELVES=['To Organise','Under the Kitchen','In the Box'];
 function locationText(loc){
   if(loc.checkedOut) return 'Currently checked out (off shelf)';
-  if(loc.shelf==='To Organise') return 'To Organise — not yet shelved';
+  if(STORAGE_SHELVES.includes(loc.shelf)) return loc.shelf+' — not yet shelved';
   const layerName=loc.layer==='1'?'back row':loc.layer==='2'?'middle row':'front row';
   return `${loc.shelf} · Layer ${loc.layer} — ${layerName}`;
 }
@@ -937,7 +968,8 @@ function renderMoveControls(book){
   const layerSel=document.getElementById('moveLayer');
   shelfSel.value=loc.checkedOut?'checked-out':loc.shelf;
   layerSel.value=(loc.layer&&loc.layer!=='0')?loc.layer:'1';
-  layerSel.disabled=loc.checkedOut||loc.shelf==='To Organise';
+  const noLayer=['checked-out',...STORAGE_SHELVES];
+  layerSel.disabled=noLayer.includes(shelfSel.value);
 }
 function setLocation(){
   if(!state.activeBook) return;
@@ -955,6 +987,8 @@ function setLocation(){
   document.getElementById('modalLocation').textContent=locationText(bookLocation(book));
   renderGrid();
   renderOrganise();
+  renderStorageSection('Under the Kitchen','kitchenGrid','kitchenSub');
+  renderStorageSection('In the Box','boxGrid','boxSub');
   if(state.activeShelf) renderPanelBooks(state.activeShelf,state.activeLayer);
   updateStats();
 }
@@ -1039,57 +1073,58 @@ document.getElementById('synopsisBtn').addEventListener('click',()=>{
 document.getElementById('moveSaveBtn').addEventListener('click',setLocation);
 document.getElementById('moveShelf').addEventListener('change',()=>{
   const v=document.getElementById('moveShelf').value;
-  document.getElementById('moveLayer').disabled=v==='checked-out'||v==='To Organise';
+  const noLayer=['checked-out','To Organise','Under the Kitchen','In the Box'];
+  document.getElementById('moveLayer').disabled=noLayer.includes(v);
 });
 document.getElementById('bookOverlay').addEventListener('click',e=>{
   if(e.target===document.getElementById('bookOverlay')) closeBook();
 });
 
 // ── To Organise section ──
-function organiseBooks(){
-  return BOOKS.filter(b=>{const l=bookLocation(b);return !l.checkedOut&&l.shelf==='To Organise';});
-}
-function renderOrganise(){
-  const all=organiseBooks();
-  const q=(document.getElementById('organiseSearch').value||'').trim().toLowerCase();
+function renderStorageSection(shelfName, gridId, subId, searchId){
+  const all=BOOKS.filter(b=>{const l=bookLocation(b);return !l.checkedOut&&l.shelf===shelfName;});
+  const q=searchId?(document.getElementById(searchId).value||'').trim().toLowerCase():'';
   const list=q?all.filter(b=>b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)):all;
-  document.getElementById('organiseSub').textContent=
-    all.length===0?'All books shelved — nothing to organise':
-    `${all.length} book${all.length===1?'':'s'} waiting for a shelf`;
-  const grid=document.getElementById('organiseGrid');
+  if(subId) document.getElementById(subId).textContent=
+    all.length===0?'Empty':
+    `${all.length} book${all.length===1?'':'s'}`;
+  const grid=document.getElementById(gridId);
   if(list.length===0){
-    grid.innerHTML=`<div class="organise-empty">${all.length===0?'Nothing here — every book has a home.':'No matches for “'+q+'”.'}</div>`;
+    grid.innerHTML=`<div class=”organise-empty”>${all.length===0?'Nothing here yet.':'No matches.'}</div>`;
     return;
   }
   grid.innerHTML=list.map(b=>{
     const ng=normaliseGenre(b.genre,b.type);
     const color=genreColor(ng);
-    return `<div class="organise-card" data-title="${escapeAttr(b.title)}"><div class="book-spine-bar" style="background:${color}"></div><div class="organise-card-info"><div class="organise-card-title">${b.title}</div><div class="organise-card-author">${b.author}</div></div></div>`;
+    return `<div class=”organise-card” data-title=”${escapeAttr(b.title)}”><div class=”book-spine-bar” style=”background:${color}”></div><div class=”organise-card-info”><div class=”organise-card-title”>${b.title}</div><div class=”organise-card-author”>${b.author}</div></div></div>`;
   }).join('');
   grid.querySelectorAll('.organise-card').forEach(card=>{
-    card.addEventListener('click',()=>{
-      const bk=BOOKS.find(b=>b.title===card.dataset.title);
-      if(bk) openBook(bk);
-    });
+    card.addEventListener('click',()=>{const bk=BOOKS.find(b=>b.title===card.dataset.title);if(bk)openBook(bk);});
   });
 }
-(function(){
-  const section=document.getElementById('organiseSection');
+function renderOrganise(){renderStorageSection('To Organise','organiseGrid','organiseSub','organiseSearch');}
+
+function wireStorageSection(sectionId, toggleId, searchId, renderFn){
+  const section=document.getElementById(sectionId);
+  const tog=document.getElementById(toggleId);
   function toggle(){section.classList.toggle('open');}
-  const tog=document.getElementById('organiseToggle');
   tog.addEventListener('click',toggle);
   tog.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
   let t;
-  document.getElementById('organiseSearch').addEventListener('input',()=>{clearTimeout(t);t=setTimeout(renderOrganise,150);});
-  document.getElementById('organiseSearch').addEventListener('click',e=>e.stopPropagation());
-})();
+  document.getElementById(searchId).addEventListener('input',()=>{clearTimeout(t);t=setTimeout(renderFn,150);});
+  document.getElementById(searchId).addEventListener('click',e=>e.stopPropagation());
+}
+wireStorageSection('organiseSection','organiseToggle','organiseSearch',renderOrganise);
+wireStorageSection('kitchenSection','kitchenToggle','kitchenSearch',()=>renderStorageSection('Under the Kitchen','kitchenGrid','kitchenSub','kitchenSearch'));
+wireStorageSection('boxSection','boxToggle','boxSearch',()=>renderStorageSection('In the Box','boxGrid','boxSub','boxSearch'));
 
-const shelvedCount=BOOKS.filter(b=>b.shelf!=='To Organise').length;
-const organiseCount=BOOKS.length-shelvedCount;
-document.getElementById('headerSubtitle').textContent=`830 books · 364 shelved · 466 to organise`;
+const shelvedCount=BOOKS.filter(b=>!STORAGE_SHELVES.includes(b.shelf)).length;
+document.getElementById('headerSubtitle').textContent=`${BOOKS.length} books · ${shelvedCount} shelved · ${BOOKS.length-shelvedCount} to organise`;
 renderFilterBar();
 renderGrid();
 renderOrganise();
+renderStorageSection('Under the Kitchen','kitchenGrid','kitchenSub','kitchenSearch');
+renderStorageSection('In the Box','boxGrid','boxSub','boxSearch');
 updateStats();
 </script>
 </body>
